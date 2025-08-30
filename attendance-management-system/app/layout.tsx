@@ -21,13 +21,28 @@ const robotoMono = Roboto_Mono({
 // Improved metadata for the application
 export const metadata: Metadata = {
   title: {
-    template: "%s | Attendance MS", // Allows child pages to set their own title
-    default: "Dashboard | Attendance MS", // Default title for the app
+    template: "%s | Attendance MS",
+    default: "Dashboard | Attendance MS",
   },
   description: "A modern and efficient system to manage employee attendance.",
   icons: {
-    icon: "/favicon.ico", // Make sure to add a favicon to your public folder
+    icon: [
+      { url: '/icon/favicon.ico', sizes: 'any' },
+      { url: '/icon/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/icon/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icon/apple-touch-icon.png', sizes: '180x180' },
+    ],
+    other: [
+      {
+        rel: 'mask-icon',
+        url: '/icon/safari-pinned-tab.svg',
+        color: '#5bbad5'
+      },
+    ]
   },
+  manifest: '/icon/site.webmanifest',
 };
 
 export default function RootLayout({
@@ -45,10 +60,10 @@ export default function RootLayout({
         - `min-h-screen flex flex-col`: Ensures the layout takes up the full screen height.
       */}
       <body
-        className={`${poppins.variable} ${robotoMono.variable} bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col`}
+        className={`${poppins.variable} ${robotoMono.variable}`}
       >
         {/* You can add a Header, Sidebar, or Footer here */}
-        <main className="flex-grow">{children}</main>
+        <main className="max-w-4xl mx-auto">{children}</main>
       </body>
     </html>
   );
