@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import { Poppins, Roboto_Mono } from "next/font/google";
 import "./globals.css";
@@ -64,6 +65,7 @@ export default function RootLayout({
       >
         {/* You can add a Header, Sidebar, or Footer here */}
         <main className="max-w-4xl mx-auto">{children}</main>
+        <Toaster />
       </body>
     </html>
   );

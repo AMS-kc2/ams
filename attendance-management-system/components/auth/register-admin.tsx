@@ -39,26 +39,15 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+import { COURSES } from "@/constants";
+import { useRouter } from "next/navigation";
+
 type MultiSelectComboboxProps = {
   options: string[];
   value: string[];
   onChange: (value: string[]) => void;
   placeholder?: string;
 };
-/* ---------- Mock course data (replace with real list or fetch) ---------- */
-const COURSES = [
-  "MTH101 — Calculus I",
-  "PHY101 — Physics I",
-  "CHM101 — Chemistry I",
-  "ENG101 — English Composition",
-  "CSE101 — Intro to Programming",
-  "MTH201 — Calculus II",
-  "CSE201 — Data Structures",
-  "MEE201 — Materials Engineering",
-  "MTH301 — Linear Algebra",
-  "CSE301 — Algorithms",
-  "EGR401 — Project Design",
-];
 
 const STEP_FIELDS: Record<number, Array<keyof FormValues>> = {
   1: ["lecturerId", "password", "confirmPassword", "level"],
@@ -154,6 +143,7 @@ type RegisterAdminProps = {
 
 export default function RegisterAdmin({ setSteps }: RegisterAdminProps) {
   const [currentStep, setCurrentStep] = useState<number>(1);
+  const router = useRouter();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -243,10 +233,13 @@ export default function RegisterAdmin({ setSteps }: RegisterAdminProps) {
   }
 
   function onSubmit(values: FormValues) {
-    // Final submit
-    console.log("Admin registration payload:", values);
-    // TODO: send to API
-    alert("Admin account created — check console for payload.");
+    // Handle student login logic here
+    // use timeput to represent req
+    setTimeout(() => {
+      console.log("Lecture SignUp data:", values);
+    }, 2000);
+
+    router.push("/lecturer/dashboard");
   }
 
   /* small helper for rendering error text */

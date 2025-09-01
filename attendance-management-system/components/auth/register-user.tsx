@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select"; // <- using your UI wrapper (recommended)
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronLeft, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import z from "zod";
 
@@ -51,7 +52,6 @@ type RegisterUserProps = {
 
 /* ------------------ Component ------------------ */
 export default function RegisterUser({ setSteps }: RegisterUserProps) {
-  
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -61,10 +61,16 @@ export default function RegisterUser({ setSteps }: RegisterUserProps) {
       semester: undefined,
     },
   });
+  const router = useRouter();
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // send to API or advance flow
+    // Handle student login logic here
+    // use timeput to represent req
+    setTimeout(() => {
+      console.log("Student sigup data:", values);
+    }, 2000);
+
+    router.push("/auth/student/select-courses");
   }
 
   return (
@@ -80,9 +86,7 @@ export default function RegisterUser({ setSteps }: RegisterUserProps) {
         <div className="mb-4">
           <User size={40} className="text-primary mx-auto" />
         </div>
-        <h1 className="text-3xl font-bold text-primary">
-          Create Your Account
-        </h1>
+        <h1 className="text-3xl font-bold text-primary">Create Your Account</h1>
         <p className="text-sm text-muted-foreground mt-2">
           Sign up as a student to get started
         </p>

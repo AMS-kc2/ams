@@ -40,7 +40,13 @@ export default function LoginPage() {
   });
 
   const onSubmit = (data: FormData) => {
-    console.log("Role:", role, "Data:", data);
+    // Handle student login logic here
+    // use timeput to represent req
+    setTimeout(() => {
+      console.log("Student login data:", data);
+    }, 2000);
+
+    router.push("/student/dashboard");
   };
 
   return (
@@ -62,9 +68,16 @@ export default function LoginPage() {
       </Tabs>
 
       {/* Dynamic Title */}
-      <h2 className="mt-6 text-2xl font-semibold tracking-tight text-primary text-pretty">
-        Login as {role === "lecturer" ? "Lecturer" : "Student"}
-      </h2>
+      <div className="text-center space-y-2">
+        <h2 className="mt-6 text-2xl font-semibold tracking-tight text-primary text-pretty">
+          Login as {role === "lecturer" ? "Lecturer" : "Student"}
+        </h2>
+        {role === "student" && (
+          <p className="text-sm text-muted-foreground">
+            Note: you won&apos;t be able to log out once logged in.
+          </p>
+        )}
+      </div>
 
       {/* Form Card */}
       <Card className="w-full max-w-sm mt-4">
