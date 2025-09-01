@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex h-screen flex-col items-center justify-between p-20">
+    <div className="flex h-screen max-w-4xl mx-auto flex-col items-center justify-between p-20">
       <div>
         <h1 className="text-3xl font-bold text-primary">KCS. 2.0</h1>
         <HorizontalRule />

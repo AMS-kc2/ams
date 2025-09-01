@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 
@@ -19,10 +19,32 @@ import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
   ArrowRight,
+  Check,
   ChevronLeft,
-  GraduationCap
+  ChevronsUpDown,
+  GraduationCap,
 } from "lucide-react";
 
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+type MultiSelectComboboxProps = {
+  options: string[];
+  value: string[];
+  onChange: (value: string[]) => void;
+  placeholder?: string;
+};
 /* ---------- Mock course data (replace with real list or fetch) ---------- */
 const COURSES = [
   "MTH101 — Calculus I",
@@ -64,85 +86,63 @@ const schema = z
 
 type FormValues = z.infer<typeof schema>;
 
-/* ---------- Simple searchable multi-select component ---------- */
-function MultiSelectSearch({
+export function MultiSelectCombobox({
   options,
   value,
   onChange,
-  placeholder = "Search courses...",
-}: {
-  options: string[];
-  value: string[];
-  onChange: (v: string[]) => void;
-  placeholder?: string;
-}) {
-  const [query, setQuery] = useState("");
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return options.filter(
-      (o) =>
-        (!q || o.toLowerCase().includes(q)) &&
-        // hide already selected in list (we still show them in chips)
-        !value.includes(o)
-    );
-  }, [options, query, value]);
+  placeholder = "Select courses...",
+}: MultiSelectComboboxProps) {
+  const [open, setOpen] = useState(false);
 
-  function add(item: string) {
-    onChange([...value, item]);
-    setQuery("");
-  }
-  function remove(item: string) {
-    onChange(value.filter((v) => v !== item));
-  }
+  const toggleValue = (val: string) => {
+    if (value.includes(val)) {
+      onChange(value.filter((v) => v !== val));
+    } else {
+      onChange([...value, val]);
+    }
+  };
 
   return (
-    <div className="w-full">
-      <div className="flex flex-wrap gap-2 mb-2">
-        {value.map((v) => (
-          <div
-            key={v}
-            className="flex items-center gap-2 bg-primary/10 text-primary px-2 py-1 rounded-full text-sm"
-          >
-            <span className="max-w-xs truncate">{v}</span>
-            <button
-              type="button"
-              onClick={() => remove(v)}
-              className="text-xs opacity-80 hover:opacity-100"
-              aria-label={`Remove ${v}`}
-            >
-              ×
-            </button>
-          </div>
-        ))}
-      </div>
-
-      <input
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder={placeholder}
-        className="w-full border rounded-md px-3 py-2 outline-none focus:ring-2 focus:ring-primary/40"
-        aria-label="Search courses"
-      />
-
-      {query && filtered.length === 0 && (
-        <p className="text-xs text-muted-foreground mt-2">No courses match.</p>
-      )}
-
-      {filtered.length > 0 && (
-        <div className="mt-2 max-h-44 overflow-auto border rounded-md bg-white">
-          {filtered.map((opt) => (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => add(opt)}
-              className="w-full text-left px-3 py-2 hover:bg-gray-100"
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between"
+        >
+          {value.length > 0
+            ? `${value.length} course(s) selected`
+            : placeholder}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[320px] p-0">
+        <Command>
+          <CommandInput placeholder="Search courses..." />
+          <CommandList>
+            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandGroup>
+              {options.map((option) => (
+                <CommandItem
+                  key={option}
+                  onSelect={() => toggleValue(option)}
+                  className="cursor-pointer"
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      value.includes(option) ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {option}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -219,12 +219,13 @@ export default function RegisterAdmin({ setSteps }: RegisterAdminProps) {
       const ok = await trigger(...fields);
       if (!ok) {
         // focus first field for better UX
-        const firstField = fields[0]
+        const firstField = fields[0];
         if (firstField) {
           try {
             setFocus(firstField);
           } catch (err) {
             /* ignore if focus can't be set */
+            console.error(err);
           }
         }
         // move user to the step that failed
@@ -387,7 +388,8 @@ export default function RegisterAdmin({ setSteps }: RegisterAdminProps) {
                   <label className="block text-sm font-medium mb-1">
                     Courses (search & add)
                   </label>
-                  <MultiSelectSearch
+                  <MultiSelectCombobox
+                    placeholder="Select courses..."
                     options={COURSES}
                     value={getValues().courses}
                     onChange={(v) => setValue("courses", v)}
@@ -442,8 +444,7 @@ export default function RegisterAdmin({ setSteps }: RegisterAdminProps) {
             )}
           </div>
 
-          {
-          currentStep === 1 ? (
+          {currentStep === 1 ? (
             <Button size={"lg"} className="w-full" onClick={nextStep}>
               Continue
             </Button>
@@ -457,26 +458,26 @@ export default function RegisterAdmin({ setSteps }: RegisterAdminProps) {
               >
                 <ArrowLeft /> Prev
               </Button>
-              <Button size={"lg"} 
-                className="flex-1" 
-                onClick={nextStep}>
+              <Button size={"lg"} className="flex-1" onClick={nextStep}>
                 Next <ArrowRight />
               </Button>
             </div>
-          ) : currentStep === 3 && (
-            <div className="flex items-center justify-between gap-4">
-              <Button
-                size={"lg"}
-                variant="outline"
-                onClick={prevStep}
-                className="flex-1"
-              >
-                <ArrowLeft /> Prev
-              </Button>
-              <Button size={"lg"} className="flex-1" type="submit">
-                Submit
-              </Button>
-            </div>
+          ) : (
+            currentStep === 3 && (
+              <div className="flex items-center justify-between gap-4">
+                <Button
+                  size={"lg"}
+                  variant="outline"
+                  onClick={prevStep}
+                  className="flex-1"
+                >
+                  <ArrowLeft /> Prev
+                </Button>
+                <Button size={"lg"} className="flex-1" type="submit">
+                  Submit
+                </Button>
+              </div>
+            )
           )}
         </form>
       </div>
