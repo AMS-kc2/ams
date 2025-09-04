@@ -1,8 +1,6 @@
 
-const onboardingPage = () => {
-  return (
-    <div>onboardingPage</div>
-  )
-}
+const LecturerOnboardingPage = () => {
+  return <div>LecturerOnboardingPage</div>;
+};
 
-export default onboardingPage
+export default LecturerOnboardingPage;

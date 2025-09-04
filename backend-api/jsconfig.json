@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "#config/*": [
+        "src/config/*"
+      ],
+      "#controllers/*": [
+        "src/controllers/*"
+      ],
+      "#libs/*": [
+        "src/libs/*"
+      ],
+      "#routes/*": [
+        "src/routes/*"
+      ],
+      "#schema/*": [
+        "src/schema/*"
+      ]
+    }
+  },
+  "include": [
+    "src"
+  ]
+}

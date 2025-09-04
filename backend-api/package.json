@@ -1,0 +1,38 @@
+{
+  "author": "Abu AbdirRahman",
+  "dependencies": {
+    "@prisma/client": "^6.14.0",
+    "argon2": "^0.43.1",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.0.1",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.1",
+    "nodemailer": "^7.0.5",
+    "prisma": "^6.15.0",
+    "zod": "^4.1.5"
+  },
+  "description": "KCS-2.0 Backend API",
+  "devDependencies": {
+    "@biomejs/biome": "2.2.2"
+  },
+  "imports": {
+    "#config/*": "./src/config/*.js",
+    "#controllers/*": "./src/controllers/*.js",
+    "#libs/*": "./src/libs/*.js",
+    "#routes/*": "./src/routes/*.js",
+    "#schema/*": "./src/schema/*.js"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "main": "index.js",
+  "name": "backend-api",
+  "scripts": {
+    "db:generate": "npx prisma generate",
+    "dev": "nodemon index.js"
+  },
+  "type": "module",
+  "version": "1.0.0"
+}

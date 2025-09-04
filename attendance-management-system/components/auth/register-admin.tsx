@@ -19,10 +19,10 @@ import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
   ArrowRight,
+  Book,
   Check,
   ChevronLeft,
   ChevronsUpDown,
-  GraduationCap,
 } from "lucide-react";
 
 import {
@@ -57,7 +57,7 @@ const STEP_FIELDS: Record<number, Array<keyof FormValues>> = {
 /* ------------------ Validation schema ------------------ */
 const schema = z
   .object({
-    lecturerId: z.string().min(3, "Enter a valid lecturer id"),
+    lecturerId: z.string().min(3, "Enter a valid lecturer ID"),
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string().min(8),
     level: z.enum(["100", "200", "300", "400", "500"]),
@@ -136,12 +136,8 @@ export function MultiSelectCombobox({
 }
 
 /* ------------------ RegisterAdmin component ------------------ */
-type RegisterAdminProps = {
-  setSteps: (step: "choose" | "register") => void;
-  steps: "choose" | "register";
-};
 
-export default function RegisterAdmin({ setSteps }: RegisterAdminProps) {
+export default function RegisterAdmin() {
   const [currentStep, setCurrentStep] = useState<number>(1);
   const router = useRouter();
 
@@ -239,7 +235,7 @@ export default function RegisterAdmin({ setSteps }: RegisterAdminProps) {
       console.log("Lecture SignUp data:", values);
     }, 2000);
 
-    router.push("/lecturer/dashboard");
+    router.push("/auth/lecturer/onboarding");
   }
 
   /* small helper for rendering error text */
@@ -249,14 +245,14 @@ export default function RegisterAdmin({ setSteps }: RegisterAdminProps) {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4 relative space-y-10">
       <div className="absolute top-10 left-10">
-        <Button size={"sm"} variant="ghost" onClick={() => setSteps("choose")}>
+        <Button size={"sm"} variant="ghost" onClick={() => router.back()}>
           <ChevronLeft size={16} className="mr-1" /> Back
         </Button>
       </div>
       <div className="space-y-6">
         <div className="text-center">
           <div className="mb-4">
-            <GraduationCap size={40} className="text-primary mx-auto" />
+            <Book size={40} className="text-primary mx-auto" />
           </div>
           <h1 className="text-3xl font-bold text-primary">
             Create Admin Account
@@ -286,11 +282,11 @@ export default function RegisterAdmin({ setSteps }: RegisterAdminProps) {
       </div>
 
       <div className="w-full max-w-lg p-8 space-y-8 bg-white rounded-lg shadow-lg">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
           {/* CONTENT AREA */}
-          <div className="min-h-[260px]">
+          <div className="min-h-[260px] space-y-10">
             {currentStep === 1 && (
-              <div className="space-y-5">
+              <div className="space-y-8">
                 <div>
                   <label className="block text-sm font-medium mb-1">
                     Lecturer ID
@@ -355,7 +351,7 @@ export default function RegisterAdmin({ setSteps }: RegisterAdminProps) {
             )}
 
             {currentStep === 2 && (
-              <div className="space-y-5">
+              <div className="space-y-8">
                 <div>
                   <label className="block text-sm font-medium mb-1">
                     Semester
@@ -393,7 +389,7 @@ export default function RegisterAdmin({ setSteps }: RegisterAdminProps) {
             )}
 
             {currentStep === 3 && (
-              <div className="space-y-5">
+              <div className="space-y-8">
                 <div>
                   <label className="block text-sm font-medium mb-1">
                     Total number of classes this semester
@@ -476,7 +472,7 @@ export default function RegisterAdmin({ setSteps }: RegisterAdminProps) {
       </div>
       <div className="-mt-5 text-lg text-center">
         or {""}
-        <Link href="/log-in" className="text-sm text-primary">
+        <Link href="/auth/lecturer/log-in" className="text-sm text-primary">
           Login
         </Link>
       </div>

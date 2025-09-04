@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select"; // <- using your UI wrapper (recommended)
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronLeft, User } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import z from "zod";
@@ -44,14 +45,8 @@ const formSchema = z.object({
   semester: z.enum(["1st", "2nd"], { error: "Please select a semester." }),
 });
 
-/* ------------------ Props ------------------ */
-type RegisterUserProps = {
-  setSteps: (step: "choose" | "register") => void;
-  steps: "choose" | "register";
-};
-
 /* ------------------ Component ------------------ */
-export default function RegisterUser({ setSteps }: RegisterUserProps) {
+export default function RegisterUser() {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -74,9 +69,9 @@ export default function RegisterUser({ setSteps }: RegisterUserProps) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-4 relative space-y-15">
+    <div className="flex min-h-screen flex-col items-center justify-center p-4 relative space-y-10">
       <div className="absolute top-10 left-10">
-        <Button size={"sm"} variant="ghost" onClick={() => setSteps("choose")}>
+        <Button size={"sm"} variant="ghost" onClick={() => router.back()}>
           <ChevronLeft size={16} className="mr-1" />
           Back
         </Button>
@@ -94,7 +89,7 @@ export default function RegisterUser({ setSteps }: RegisterUserProps) {
 
       <div className="w-full max-w-lg p-8 space-y-8 bg-white rounded-lg shadow-lg">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
               control={form.control}
               name="matricNumber"
@@ -194,6 +189,13 @@ export default function RegisterUser({ setSteps }: RegisterUserProps) {
             </Button>
           </form>
         </Form>
+      </div>
+
+      <div className="-mt-5 text-lg text-center">
+        or {""}
+        <Link href="/auth/student/log-in" className="text-sm text-primary">
+          Login
+        </Link>
       </div>
     </div>
   );

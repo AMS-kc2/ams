@@ -15,28 +15,27 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, GraduationCap } from "lucide-react";
+// import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Book, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
-  matricNumber: z
+  lecturerId: z.string().min(2, { message: "lecturerId is required" }),
+  password: z
     .string()
-    .min(2, { message: "Matriculation number is required" }),
-  surname: z
-    .string()
-    .min(2, { message: "Surname must be at least 2 characters." })
-    .transform((val) => val.toLowerCase()),
+    .min(6, { message: "Password must be at least 6 characters" }),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
-export default function StudentLoginPage() {
+export default function LecturerLoginPage() {
+  // const [role, setRole] = useState<"lecturer" | "student">("lecturer");
   const router = useRouter();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: { matricNumber: "", surname: "" },
+    defaultValues: { lecturerId: "", password: "" },
   });
 
   const onSubmit = (data: FormData) => {
@@ -57,13 +56,13 @@ export default function StudentLoginPage() {
         </Button>
       </div>
 
-      {/* Title */}
-      <div className="text-center space-y-4">
+      {/* Page Title */}
+      <div className="text-center space-y-3">
         <div className="mb-4">
-          <GraduationCap size={40} className="text-primary mx-auto" />
+          <Book size={40} className="text-primary mx-auto" />
         </div>
         <h2 className="mt-6 text-2xl font-semibold tracking-tight text-primary text-pretty">
-          Student Login
+          Lecturer&apos;s Login
         </h2>
         <p className="text-sm text-muted-foreground">
           Note: you won&apos;t be able to log out once logged in.
@@ -77,12 +76,12 @@ export default function StudentLoginPage() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
-                name="matricNumber"
+                name="lecturerId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Matriculation Number</FormLabel>
+                    <FormLabel>Lecturer lecturerId</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter Matric Number" {...field} />
+                      <Input placeholder="Enter your Lecturer lecturerId" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -91,12 +90,16 @@ export default function StudentLoginPage() {
 
               <FormField
                 control={form.control}
-                name="surname"
+                name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Surname</FormLabel>
+                    <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your Surname" {...field} />
+                      <Input
+                        type="password"
+                        placeholder="Enter your password"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -104,18 +107,17 @@ export default function StudentLoginPage() {
               />
 
               <Button type="submit" className="w-full">
-                Login as Student
+                Login
               </Button>
             </form>
           </Form>
         </CardContent>
       </Card>
-
       {/* Footer */}
       <div>
         <p className="text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link href="/auth/student/sign-up" className="hover:underline text-primary">
+          <Link href="/auth/lecturer/sign-up" className="hover:underline text-primary">
             Sign up
           </Link>
         </p>

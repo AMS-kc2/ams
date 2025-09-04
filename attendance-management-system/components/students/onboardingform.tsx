@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { COURSES } from "@/constants";
 import { CircleMinus, CirclePlus, Frown } from "lucide-react";
 import React from "react";
 
@@ -19,16 +20,15 @@ const useCourseSelection = () => {
   return context;
 };
 
-const OnboardingForm = ({ 
-  courses, 
-  selectedCourses, 
-  setSelectedCourses 
-}: { 
-  courses: string[], 
-  selectedCourses: string[], 
-  setSelectedCourses: React.Dispatch<React.SetStateAction<string[]>> 
+const OnboardingForm = ({
+  courses,
+  selectedCourses,
+  setSelectedCourses,
+}: {
+  courses: string[];
+  selectedCourses: string[];
+  setSelectedCourses: React.Dispatch<React.SetStateAction<string[]>>;
 }) => {
-
   const toggleCourse = React.useCallback((course: string) => {
     setSelectedCourses((prev) =>
       prev.includes(course)
@@ -51,8 +51,8 @@ const OnboardingForm = ({
             No courses found
           </p>
           <p className="text-sm text-muted-foreground max-w-md">
-            We couldn&apos;t find any courses matching your criteria. Try adjusting
-            your search or check back later.
+            We couldn&apos;t find any courses matching your criteria. Try
+            adjusting your search or check back later.
           </p>
         </div>
       </div>
@@ -63,12 +63,12 @@ const OnboardingForm = ({
     <CourseSelectionContext.Provider
       value={{ selectedCourses, toggleCourse, isSelected }}
     >
-      <div className="w-full p-5 space-y-3 mb-15">
+      <div className="w-full p-5 space-y-3 mb-10">
         <div className="mb-6">
           <h2 className="text-lg font-semibold mb-2">Select Your Courses</h2>
           <p className="text-sm text-muted-foreground">
-            Choose the courses you'd like to enroll in ({selectedCourses.length}{" "}
-            selected)
+            Choose the courses you'd like to Enroll in{" "}
+            <b>({COURSES.length} total)</b>
           </p>
         </div>
 
@@ -78,6 +78,23 @@ const OnboardingForm = ({
           ))}
         </div>
       </div>
+
+      {selectedCourses.length > 0 && (
+        <div className="w-full p-5 space-y-3 mb-15">
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-2">Selected Courses</h2>
+            <p className="text-sm text-muted-foreground">
+              Drop the course(s) from <b>({selectedCourses.length} Enroled)</b>
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {selectedCourses.map((course) => (
+              <CourseInput key={course} course={course} />
+            ))}
+          </div>
+        </div>
+      )}
     </CourseSelectionContext.Provider>
   );
 };

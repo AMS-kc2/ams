@@ -1,0 +1,8 @@
+# Ignore everything ignorable from the backend....
+
+.env
+node_modules/
+genrated/
+
+
+/src/generated/prisma

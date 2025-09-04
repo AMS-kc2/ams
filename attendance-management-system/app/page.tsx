@@ -18,7 +18,7 @@ export default function Home() {
       </div>
 
       <Button size={"lg"} className="w-full" asChild aria-label="Get Started">
-        <Link href="auth/sign-up">Get Started</Link>
+        <Link href="/auth/sign-up">Get Started</Link>
       </Button>
     </div>
   );

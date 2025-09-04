@@ -17,10 +17,11 @@ const SelectCoursesPage = () => {
 
   //setup the filtered courses based on the search term
   const filteredCourses = debouncedSearchTerm
-    ? COURSES.filter((course) =>
-        course.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+    ? COURSES.filter((course) => !selectedCourses.includes(course)).filter(
+        (course) =>
+          course.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
       )
-    : COURSES;
+    : COURSES.filter((course) => !selectedCourses.includes(course));
 
   return (
     <div className="min-h-screen max-w-xl relative flex items-center flex-col gap-5 mx-auto py-20 px-5">
