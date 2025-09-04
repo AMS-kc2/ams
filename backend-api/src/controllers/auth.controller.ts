@@ -82,9 +82,9 @@ export const lecturerSignUp = async (req, res) => {
 			data: {
 				lecturerId,
 				passwordHash,
-				level,
 				courses,
-				semester,
+				level: `L${level}`,
+				semester: semester === "1st" ? "FIRST" : "SECOND",
 				totalClasses,
 			},
 		});
@@ -97,17 +97,17 @@ export const lecturerSignUp = async (req, res) => {
 
 export const lecturerLogin = async (res, req) => {
 	try {
-		const {password, lecturerId} = await lecturerLoginSchema.parseAsync(req.body)
+		const { password, lecturerId } = await lecturerLoginSchema.parseAsync(req.body);
 
 		const lecturer = await prisma.lecturer.findUnique({
-			where: {lecturerId}
-		})
+			where: { lecturerId },
+		});
 
-		if(!lecturer){
+		if (!lecturer) {
 			throw new AppError(`There's no Lecturer with id: ${lecturerId}`);
 		}
 
-		if(lecturer.password !== password){
+		if (lecturer.passwordHash !== password) {
 			throw new AppError("The Password you Entered wasn't correct");
 		}
 	} catch (error) {
