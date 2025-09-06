@@ -1,11 +1,16 @@
-"use client"
+"use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-const LecturerDashBoardPage = () => {
-  const router = useRouter()
-     router.push("/lecturer/dashboard");
-  return <></>
-}
+const LecturerHomePage = () => {
+  const router = useRouter();
 
-export default LecturerDashBoardPage
+  useEffect(() => {
+    router.push("/lecturer/dashboard");
+  }, [router]);
+
+  return null;
+};
+
+export default LecturerHomePage;

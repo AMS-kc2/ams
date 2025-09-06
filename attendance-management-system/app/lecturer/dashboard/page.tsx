@@ -13,14 +13,15 @@ const Dashboard = () => {
   return (
     <div className="relative w-full">
       <div className="absolute -top-14 right-4">
-        <button className='w-30 flex gap-2 items-center justify-center cursor-pointer border rounded-lg border-black p-2 text-xs'>
+        <button className="w-30 flex gap-2 items-center justify-center cursor-pointer border rounded-lg border-black p-2 text-xs">
           <LogOut size={15} /> Log Out
         </button>
       </div>
 
       <div className="border-t-2 border-background/90 p-2 my-5">
         <p className="text-lg font-semibold">
-          Welcome, <span className="text-2xl font-extrabold">DR. AHMED RAFIU</span>
+          Welcome,{" "}
+          <span className="text-2xl font-extrabold">DR. AHMED RAFIU</span>
         </p>
         <span className="text-sm font-light">
           Manage attendance for your courses.
@@ -45,29 +46,32 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex flex-col items-center justify-between gap-1">
                     <Users />
-                    <p className='text-2xl font-bold'>576</p>
-                    <span className='text-xs font-light'>Students</span>
+                    <p className="text-2xl font-bold">576</p>
+                    <span className="text-xs font-light">Students</span>
                   </div>
                   <div className="flex flex-col items-center justify-between gap-1">
                     <PieChart />
-                    <p className='text-2xl font-bold'>89%</p>
-                    <span className='text-sm font-light'>Attendance</span>
+                    <p className="text-2xl font-bold">89%</p>
+                    <span className="text-sm font-light">Attendance</span>
                   </div>
                 </div>
-                <div className='space-y-1'>
-                  <div className='flex items-center justify-between'>
-                    <p className='text-xs font-light'>Course progress</p>
-                    <p className='text-xs font-light'>65%</p>
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-light">Course progress</p>
+                    <p className="text-xs font-light">65%</p>
                   </div>
-                  <Progress className='h-4' value={65} />
+                  <Progress className="h-4" value={65} />
                 </div>
               </div>
             </CardContent>
             <CardFooter>
-              <div className='flex flex-col px-10 gap-5 w-full'>
+              <div className="flex flex-col px-10 gap-5 w-full">
                 <OtpDialog otp={otp} setOtp={setOtp} />
-                <Button className="cursor-pointer w-full p-5" onClick={() => {}}>
-                  <Link href="/lecturer/attendance">Attendance</Link>
+                <Button
+                  className="cursor-pointer w-full p-5"
+                  onClick={() => {}}
+                >
+                  <Link href="/lecturer/attendance/1">Attendance</Link>
                 </Button>
               </div>
             </CardFooter>
