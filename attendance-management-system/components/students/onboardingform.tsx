@@ -67,7 +67,7 @@ const OnboardingForm = ({
         <div className="mb-6">
           <h2 className="text-lg font-semibold mb-2">Select Your Courses</h2>
           <p className="text-sm text-muted-foreground">
-            Choose the courses you&aposd like to Enroll in{" "}
+            Choose the courses you&apos;d like to Enroll in{" "}
             <b>({COURSES.length} total)</b>
           </p>
         </div>
