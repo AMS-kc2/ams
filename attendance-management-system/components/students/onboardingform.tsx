@@ -29,13 +29,16 @@ const OnboardingForm = ({
   selectedCourses: string[];
   setSelectedCourses: React.Dispatch<React.SetStateAction<string[]>>;
 }) => {
-  const toggleCourse = React.useCallback((course: string) => {
-    setSelectedCourses((prev) =>
-      prev.includes(course)
-        ? prev.filter((c) => c !== course)
-        : [...prev, course]
-    );
-  }, []);
+  const toggleCourse = React.useCallback(
+    (course: string) => {
+      setSelectedCourses((prev) =>
+        prev.includes(course)
+          ? prev.filter((c) => c !== course)
+          : [...prev, course]
+      );
+    },
+    [setSelectedCourses]
+  );
 
   const isSelected = React.useCallback(
     (course: string) => selectedCourses.includes(course),
