@@ -169,7 +169,7 @@ const CoursePage = () => {
       <div className="space-y-4">
         <Card className="p-4">
           <div className="space-y-2">
-            <h1 className="font-semibold">Mark today's Attendance</h1>
+            <h1 className="font-semibold">Mark today&apos;s Attendance</h1>
             <div className="flex items-center gap-2">
               <input
                 type="radio"
