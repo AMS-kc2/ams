@@ -1,15 +1,15 @@
 // @ts-check
 import { hash, verify } from "argon2";
 import type { Request, Response } from "express";
-import db from "@/config/db.js";
-import AppError from "@/libs/utils/AppError.js";
-import { sendError, sendSuccess } from "@/libs/utils/response.js";
+import db from "../config/db";
+import AppError from "../libs/utils/AppError";
+import { sendError, sendSuccess } from "../libs/utils/response";
 import {
 	lecturerLoginSchema,
 	lecturerSignupSchema,
 	studentLoginSchema,
 	studentSignupSchema,
-} from "../schema/auth.schema.js";
+} from "../schema/auth.schema";
 
 // ====================== STUDENTS ======================
 

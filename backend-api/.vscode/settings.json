@@ -10,5 +10,7 @@
   },
   "editor.defaultFormatter": "biomejs.biome",
   "editor.formatOnSave": true,
-  "editor.inlayHints.enabled": "off"
+  "editor.inlayHints.enabled": "off",
+  "editor.fontLigatures": true,
+  "editor.renderWhitespace": "none"
 }
