@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import type { TablesInsert } from "types/database";
+// import type { TablesInsert } from "types/database";
 import z from "zod";
 import db from "../config/db";
 import AppError from "../libs/utils/AppError";
@@ -103,7 +103,7 @@ export const createCourse = async (req: Request, res: Response) => {
 
 		const course = await db
 			.from("courses")
-			.insert<TablesInsert<"courses">>({
+			.insert({
 				title,
 				code,
 				level,

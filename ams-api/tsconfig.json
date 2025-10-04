@@ -1,21 +1,19 @@
 {
-  "compilerOptions": {
-    "baseUrl": "./src",
-    "esModuleInterop": true,
-    "module": "commonjs",
-    "outDir": "dist",
-    "paths": {
-      "@config/*": ["config/*"],
-      "@lib/*": ["lib/*"],
-      "@middleware/*": ["middleware/*"],
-      "@modules/*": ["modules/*"]
-    },
-    "rootDir": "src",
-    "skipLibCheck": true,
-    "strict": true,
-    "target": "ES2022"
-  },
-  "include": [
-    "src"
-  ]
+	"compilerOptions": {
+		"outDir": "dist",
+		"rootDir": "src",
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"module": "CommonJS",
+		"target": "ES2022",
+		"strict": true,
+		"baseUrl": "./",
+		"paths": {
+			"@config/*": ["src/config/*"],
+			"@lib/*": ["src/libs/*"],
+			"@controllers/*": ["src/controllers/*"]
+		}
+	},
+	"exclude": ["node_modules"],
+	"include": ["src"]
 }
