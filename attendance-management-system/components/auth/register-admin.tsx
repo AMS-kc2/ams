@@ -41,6 +41,8 @@ import {
 
 import { COURSES } from "@/constants";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import axiosInstance from "@/lib/axios";
 
 type MultiSelectComboboxProps = {
   options: string[];
@@ -228,14 +230,14 @@ export default function RegisterAdmin() {
     setCurrentStep((s) => Math.max(1, s - 1));
   }
 
-  function onSubmit(values: FormValues) {
-    // Handle student login logic here
-    // use timeput to represent req
-    setTimeout(() => {
-      console.log("Lecture SignUp data:", values);
-    }, 2000);
+  async function onSubmit(values: FormValues) {
+    try {
+      await axiosInstance.post("/auth/lecturer/sign-up", values);
 
-    router.push("/auth/lecturer/onboarding");
+      router.push("/auth/lecturer/onboarding");
+    } catch (error) {
+      toast(error as string);
+    }
   }
 
   /* small helper for rendering error text */

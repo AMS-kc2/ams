@@ -18,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { ChevronLeft, GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import axiosInstance from "@/lib/axios";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   matricNumber: z
@@ -39,14 +41,14 @@ export default function StudentLoginPage() {
     defaultValues: { matricNumber: "", surname: "" },
   });
 
-  const onSubmit = (data: FormData) => {
-    // Handle student login logic here
-    // use timeput to represent req
-    setTimeout(() => {
-      console.log("Student login data:", data);
-    }, 2000);
+  const onSubmit = async (data: FormData) => {
+    try {
+      await axiosInstance.post("/auth/students/log-in", data);
 
-    router.push("/student/dashboard");
+      router.push("/student/dashboard");
+    } catch (error) {
+      toast(error as string);
+    }
   };
 
   return (
@@ -115,7 +117,10 @@ export default function StudentLoginPage() {
       <div>
         <p className="text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link href="/auth/student/sign-up" className="hover:underline text-primary">
+          <Link
+            href="/auth/student/sign-up"
+            className="hover:underline text-primary"
+          >
             Sign up
           </Link>
         </p>

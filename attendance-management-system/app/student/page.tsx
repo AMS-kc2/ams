@@ -1,11 +1,16 @@
-"use client"
+"use client";
 
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const StudentDashBoardPage = () => {
-  const router = useRouter()
+  const router = useRouter();
 
-  return router.push("/student/dashboard")
-}
+  useEffect(() => {
+    router.push("/student/dashboard");
+  }, [router]);
 
-export default StudentDashBoardPage
+  return null;
+};
+
+export default StudentDashBoardPage;

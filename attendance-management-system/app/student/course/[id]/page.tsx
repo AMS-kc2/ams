@@ -1,9 +1,11 @@
 "use client";
 
+import Loading from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { COURSES } from "@/constants";
+// import { COURSES } from "@/constants";
+import { useFetch } from "@/hooks/use-api";
 import { Label } from "@radix-ui/react-label";
 import { ArrowRight, ChevronLeft, CircleCheckBig } from "lucide-react";
 import Link from "next/link";
@@ -11,12 +13,37 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
+type course = {
+  code: string;
+  created_at: string | null;
+  id: number;
+  level: string;
+  semester: string;
+  title: string;
+};
+
+type payload = {
+  course: course;
+};
+
 const CoursePage = () => {
+  const id = useParams().id as string;
+
+  const { data, isLoading, error } = useFetch<payload>(
+    ["courses"],
+    `/courses/${id}`
+  );
+
+  if (!data || !data.course) return <p>No data found</p>;
+
+  if (isLoading) return <Loading />;
+  if (error) return <p>Error: {error.message}</p>;
+
   const [signInOtp, setSignInOtp] = useState("");
   const [signOutOtp, setSignOutOtp] = useState("");
   const [success, setSuccess] = useState(false);
-  const router = useRouter()
-
+  const router = useRouter();
+  const { course } = data;
 
   const handleSignIn = async () => {
     try {
@@ -88,13 +115,7 @@ const CoursePage = () => {
     }
   };
 
-
-
-  const id =  useParams().id
-  const course = COURSES[parseInt(id as string) -1 ]
-  console.log(id, course);
-
-  if(success){
+  if (success) {
     return (
       <div className="space-y-10 px-5 relative">
         <div className="absolute -top-8 left-5">
@@ -128,7 +149,9 @@ const CoursePage = () => {
         </div>
         <div className="w-full space-y-15 max-w-md mx-auto">
           <div className="bg-primary/30 p-4 rounded-md text-center">
-            <p className="text-sm text-primary text-balance">Remember : 80% attendance is required to qualify for exams</p>
+            <p className="text-sm text-primary text-balance">
+              Remember : 80% attendance is required to qualify for exams
+            </p>
           </div>
           <div className="px-5 flex items-center justification-center">
             <Button
@@ -149,18 +172,17 @@ const CoursePage = () => {
       <div className="space-y-2">
         <div className="flex items-center space-x-2">
           <p className="text-2xl font-bold text-center text-primary">
-            KWASU {course.split(" — ")[0].slice(0, 3)}{" "}
-            {course.split(" ")[0].slice(3)}
+            KWASU {course?.code} {course?.title}
           </p>
           <span className="w-2 h-2 bg-black rounded-full"></span>
           <span className="font-medium text-center">
-            {course.split(" — ")[1]}
+            {data?.course.title.split(" — ")[1]}
           </span>
         </div>
         <p className="text-sm text-gray-600 flex gap-3 items-center">
-          <span>Lwvel 100</span>
+          <span>Level {course?.level}</span>
           <span className="w-1 h-1 bg-black rounded-full"></span>
-          <span>2nd Semester</span>
+          <span>{course?.semester} Semester</span>
         </p>
       </div>
 
@@ -256,7 +278,7 @@ const CoursePage = () => {
 export default CoursePage;
 
 {
-  /* 
+  /*
   import {
   Dialog,
   DialogClose,

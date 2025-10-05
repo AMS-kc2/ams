@@ -19,6 +19,8 @@ import { Input } from "@/components/ui/input";
 import { Book, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import axiosInstance from "@/lib/axios";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   lecturerId: z.string().min(2, { message: "lecturerId is required" }),
@@ -38,14 +40,14 @@ export default function LecturerLoginPage() {
     defaultValues: { lecturerId: "", password: "" },
   });
 
-  const onSubmit = (data: FormData) => {
-    // Handle student login logic here
-    // use timeput to represent req
-    setTimeout(() => {
-      console.log("Student login data:", data);
-    }, 2000);
+  const onSubmit = async (data: FormData) => {
+    try {
+      await axiosInstance.post("/auth/lecturer/log-in", data);
 
-    router.push("/student/dashboard");
+      router.push("/student/dashboard");
+    } catch (error) {
+      toast(error as string);
+    }
   };
 
   return (
@@ -81,7 +83,10 @@ export default function LecturerLoginPage() {
                   <FormItem>
                     <FormLabel>Lecturer lecturerId</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your Lecturer lecturerId" {...field} />
+                      <Input
+                        placeholder="Enter your Lecturer lecturerId"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -117,7 +122,10 @@ export default function LecturerLoginPage() {
       <div>
         <p className="text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
-          <Link href="/auth/lecturer/sign-up" className="hover:underline text-primary">
+          <Link
+            href="/auth/lecturer/sign-up"
+            className="hover:underline text-primary"
+          >
             Sign up
           </Link>
         </p>

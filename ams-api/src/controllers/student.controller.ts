@@ -24,9 +24,11 @@ export const getStudentWithCourse = async (req: Request, res: Response) => {
 			throw new AppError("Please Provide Valid Course Identification");
 
 		let { data: students, error } = await db
-			.from("students")
+			.from("student_courses")
 			.select("*")
-			.eq("course_id", courseId);
+			.eq("course_id", Number(courseId))
+			.eq("studeny_id", Number(courseId))
+			.eq("is_active", true);
 		// .then(data => {
 		// 	return safeStudents(data)
 		// });

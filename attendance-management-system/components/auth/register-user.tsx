@@ -1,5 +1,6 @@
 "use client";
 
+// import { signUpStudent } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -18,11 +19,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"; // <- using your UI wrapper (recommended)
+import axiosInstance from "@/lib/axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronLeft, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import z from "zod";
 
 /* ------------------ Schema ------------------ */
@@ -58,14 +61,14 @@ export default function RegisterUser() {
   });
   const router = useRouter();
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Handle student login logic here
-    // use timeput to represent req
-    setTimeout(() => {
-      console.log("Student sigup data:", values);
-    }, 2000);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await axiosInstance.post("/auth/students/sign-up", values);
 
-    router.push("/auth/student/select-courses");
+      router.push("/auth/student/select-courses");
+    } catch (error) {
+      toast(error as string);
+    }
   }
 
   return (

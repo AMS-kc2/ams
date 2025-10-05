@@ -1,5 +1,6 @@
 import { Router } from "express";
 import * as courseController from "../controllers/course.controller";
+import { authenticateJWT } from "../middleware";
 
 const router = Router();
 
@@ -7,21 +8,29 @@ const router = Router();
 router.get("/", courseController.getAllCourses);
 
 // GET /courses/student/:studentId
-router.get("/student/:studentId", courseController.getAllCourseWithStudent);
+router.get(
+	"/student/:studentId",
+	authenticateJWT,
+	courseController.getAllCourseWithStudent,
+);
 
 // GET /courses/lecturer/:lecturerId
-router.get("/lecturer/:lecturerId", courseController.getAllCourseWithLecturer);
+router.get(
+	"/lecturer/:lecturerId",
+	authenticateJWT,
+	courseController.getAllCourseWithLecturer,
+);
 
-// GET /courses/lecturer/:lecturerId
+// GET /courses/:courseId
 router.get("/:id", courseController.getCourseWithId);
 
 // POST /courses
 router.post("/", courseController.createCourse);
 
 // DELETE /courses/:id
-router.delete("/:id", courseController.deleteCourse);
+router.delete("/:id", authenticateJWT, courseController.deleteCourse);
 
 // PUT /courses/:id
-router.put("/:id", courseController.updateCourse);
+router.put("/:id", authenticateJWT, courseController.updateCourse);
 
 export default router;

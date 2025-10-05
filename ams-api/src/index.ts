@@ -2,15 +2,19 @@
 
 // import cookieParser from "cookie-parser";
 import compression from "compression";
+import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import morgan from "morgan";
+// import jwt from 'jsonwebtoken';
+
 import { handleError } from "./libs/utils/response";
-import AttendanceRoutes from "./routes/attendance.route";
+import { authenticateJWT } from "./middleware";
 // Routes
+import AttendanceRoutes from "./routes/attendance.route";
 import AuthRoutes from "./routes/auth.route";
 import CourseRoutes from "./routes/course.route";
 import LecturerRoutes from "./routes/lecturer.route";
@@ -48,7 +52,7 @@ app.use(
 
 // 4️⃣ Parse JSON + cookies
 app.use(express.json());
-// app.use(cookieParser());
+app.use(cookieParser());
 
 // 5️⃣ Response compression
 app.use(compression());
@@ -58,11 +62,11 @@ app.use(morgan("dev"));
 
 // Routes
 app.use("/v1/auth", AuthRoutes);
-app.use("/v1/lecturers", LecturerRoutes);
-app.use("/v1/students", StudentRoutes);
+app.use("/v1/lecturers", authenticateJWT, LecturerRoutes);
+app.use("/v1/students", authenticateJWT, StudentRoutes);
 app.use("/v1/courses", CourseRoutes);
-app.use("/v1/sessions", SessionRoutes);
-app.use("/v1/attendances", AttendanceRoutes);
+app.use("/v1/sessions", authenticateJWT, SessionRoutes);
+app.use("/v1/attendances", authenticateJWT, AttendanceRoutes);
 
 // Welcome endpoint
 

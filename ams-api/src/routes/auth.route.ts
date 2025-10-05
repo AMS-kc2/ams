@@ -1,4 +1,6 @@
 // @ts-check
+
+import type { Response } from "express";
 import { Router } from "express";
 import {
 	lecturerLogin,
@@ -6,15 +8,36 @@ import {
 	studentLogin,
 	studentSignup,
 } from "../controllers/auth.controller";
+import AppError from "../libs/utils/AppError";
+import { sendError, sendSuccess } from "../libs/utils/response";
+import { authenticateJWT } from "../middleware";
+import type { AuthenticatedRequest } from "../types/auth";
 
-const AuthRoute = Router();
+const AuthRouter = Router();
 
 // Students Auths
-AuthRoute.post("/students/log-in", studentLogin);
-AuthRoute.post("/students/sign-up", studentSignup);
+AuthRouter.post("/students/log-in", studentLogin);
+AuthRouter.post("/students/sign-up", studentSignup);
 
 //Lecturer Auths
-AuthRoute.post("/lecturer/log-in", lecturerLogin);
-AuthRoute.post("/lecturer/sign-up", lecturerSignUp);
+AuthRouter.post("/lecturer/log-in", lecturerLogin);
+AuthRouter.post("/lecturer/sign-up", lecturerSignUp);
 
-export default AuthRoute;
+AuthRouter.get(
+	"/students/user-info",
+	authenticateJWT,
+	(req: AuthenticatedRequest, res: Response) => {
+		// The authenticated user data is available at req.user
+		const user = req.user;
+		if (!user) {
+			return sendError(new AppError("Unauthorized", 401), res);
+		}
+		// Respond with the verified user's data
+		sendSuccess(res, {
+			isLoggedIn: true,
+			user,
+		});
+	},
+);
+
+export default AuthRouter;

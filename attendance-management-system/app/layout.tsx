@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import { Poppins, Roboto_Mono } from "next/font/google";
 import "./globals.css";
+import { Providers } from "@/providers";
 
 // Primary font for the UI
 const poppins = Poppins({
@@ -28,22 +29,20 @@ export const metadata: Metadata = {
   description: "A modern and efficient system to manage employee attendance.",
   icons: {
     icon: [
-      { url: '/icon/favicon.ico', sizes: 'any' },
-      { url: '/icon/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/icon/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: "/icon/favicon.ico", sizes: "any" },
+      { url: "/icon/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/icon/favicon-32x32.png", sizes: "32x32", type: "image/png" },
     ],
-    apple: [
-      { url: '/icon/apple-touch-icon.png', sizes: '180x180' },
-    ],
+    apple: [{ url: "/icon/apple-touch-icon.png", sizes: "180x180" }],
     other: [
       {
-        rel: 'mask-icon',
-        url: '/icon/safari-pinned-tab.svg',
-        color: '#5bbad5'
+        rel: "mask-icon",
+        url: "/icon/safari-pinned-tab.svg",
+        color: "#5bbad5",
       },
-    ]
+    ],
   },
-  manifest: '/icon/site.webmanifest',
+  manifest: "/icon/site.webmanifest",
 };
 
 export default function RootLayout({
@@ -60,12 +59,12 @@ export default function RootLayout({
         - `antialiased`: Smooths out the font for better readability.
         - `min-h-screen flex flex-col`: Ensures the layout takes up the full screen height.
       */}
-      <body
-        className={`${poppins.variable} ${robotoMono.variable}`}
-      >
+      <body className={`${poppins.variable} ${robotoMono.variable}`}>
         {/* You can add a Header, Sidebar, or Footer here */}
-        <main className="max-w-4xl mx-auto">{children}</main>
-        <Toaster />
+        <Providers>
+          <main className="max-w-4xl mx-auto">{children}</main>
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );
