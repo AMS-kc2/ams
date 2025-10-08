@@ -96,11 +96,10 @@ export const studentLogin = async (req: Request, res: Response) => {
 		//Set the JWT in a secure HTTP-only cookie
 		res.cookie(COOKIE_NAME, token, {
 			maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-			httpOnly: true,
-			// secure: process.env.NODE_ENV === "production",
-			// sameSite: "lax",
-			sameSite: "none",
-			secure: true,
+			  httpOnly: true,
+			  secure: true,             // ✅ required for HTTPS
+			  sameSite: "none",         // ✅ required for cross-site cookies
+			  path: "/",
 		});
 
 		return sendSuccess(res, student, "Student logged in", 200);
@@ -203,10 +202,9 @@ export const lecturerLogin = async (req: Request, res: Response) => {
 		res.cookie(COOKIE_NAME, token, {
 			maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
 			httpOnly: true,
-			// secure: process.env.NODE_ENV === "production",
-			// sameSite: "lax",
-			sameSite: "none",
-			secure: true,
+			secure: true,             // ✅ required for HTTPS
+			sameSite: "none",         // ✅ required for cross-site cookies
+			path: "/",
 		});
 
 		return sendSuccess(res, lecturer, "Lecturer logged in", 200);
