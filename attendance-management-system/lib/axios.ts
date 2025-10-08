@@ -1,5 +1,17 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 
+export interface ApiError {
+  code: string | null;
+  details: string | null;
+}
+
+export interface ApiResponse<T = unknown> {
+  status: "success" | "error";
+  message: string;
+  data: T | null;
+  error?: ApiError | null;
+}
+
 // Create the instance
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/v1",
@@ -23,21 +35,20 @@ axiosInstance.interceptors.response.use(
     return resData?.data ?? resData; // unwrap .data if exists
   },
 
-  (error: AxiosError) => {
+  (error: AxiosError<ApiResponse<null>>) => {
     if (error.response) {
-      // Server responded with non-2xx status
-      // @ts-ignore eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const errData: any = error.response.data;
-      console.error("[API RESPONSE ERROR]:", errData?.message || error.message);
-      console.warn("[API RESPONSE ERROR]:", errData?.message || error.message);
-      return Promise.reject(errData?.message || "Server error");
+      const resError = error.response.data;
+      const msg = resError?.message || "Server error";
+
+      console.error("[API RESPONSE ERROR]:", msg);
+      console.warn("[API RESPONSE ERROR]:", msg);
+
+      return Promise.reject(msg);
     } else if (error.request) {
-      // No response
       console.error("[API NETWORK ERROR]", error.message);
       console.warn("[API NETWORK ERROR]", error.message);
       return Promise.reject("Network error, please check your connection");
     } else {
-      // Axios internal error      // Axios internal error
       console.error("[API CONFIG ERROR]", error.message);
       console.warn("[API CONFIG ERROR]", error.message);
       return Promise.reject(error.message);
