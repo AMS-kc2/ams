@@ -35,7 +35,7 @@ app.use(helmet());
 // 2️⃣ CORS (tweak origin or use a whitelist in production)
 app.use(
 	cors({
-		origin: ["http://localhost:3000", "https://attendance-ms-2.vercel.app/"],
+		origin: ["http://localhost:3000", "https://attendance-ms-2.vercel.app/", "https://attendance-system-ten-psi.vercel.app/"],
 		credentials: true,
 	}),
 );
