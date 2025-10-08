@@ -26,9 +26,10 @@ axiosInstance.interceptors.response.use(
   (error: AxiosError) => {
     if (error.response) {
       // Server responded with non-2xx status
+      // @ts-ignore eslint-disable-next-line @typescript-eslint/no-explicit-any
       const errData: any = error.response.data;
-      console.error("[API RESPONSE ERROR]", errData?.message || error.message);
-      console.warn("[API RESPONSE ERROR]", errData?.message || error.message);
+      console.error("[API RESPONSE ERROR]:", errData?.message || error.message);
+      console.warn("[API RESPONSE ERROR]:", errData?.message || error.message);
       return Promise.reject(errData?.message || "Server error");
     } else if (error.request) {
       // No response
