@@ -55,7 +55,7 @@ app.use(
 	}),
 );
 
-app.options("*", cors());
+app.options(/.*/, cors());
 
 // 4️⃣ Parse JSON + cookies
 app.use(express.json());
