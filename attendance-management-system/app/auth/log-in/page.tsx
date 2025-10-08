@@ -72,11 +72,15 @@ export default function LoginPage() {
               surname: (data as StudentFormData).surname,
             };
 
-      const res = await axiosInstance.post(`/auth/${role}/log-in`, formData, {
-        withCredentials: true,
-      });
+      const res: { message: string } = await axiosInstance.post(
+        `/auth/${role}/log-in`,
+        formData,
+        {
+          withCredentials: true,
+        }
+      );
       console.log(res);
-      toast((res as { message: string })?.message);
+      toast(res.message);
       router.push(
         role === "lecturer" ? "/lecturer/dashboard" : "/student/dashboard"
       );

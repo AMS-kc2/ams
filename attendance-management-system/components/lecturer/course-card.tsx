@@ -85,33 +85,6 @@ export const CourseCard = ({
     return { signIn: signInLeft, signOut: signOutLeft };
   }, [activeSession]);
 
-  // Timer effect with useCallback for cleanup
-  useEffect(() => {
-    if (!activeSession) return;
-
-    const updateTimer = () => {
-      const newTimeLeft = calculateTimeLeft();
-      setTimeLeft(newTimeLeft);
-
-      // Auto-end session when both OTPs expire
-      if (
-        newTimeLeft.signIn === 0 &&
-        newTimeLeft.signOut === 0 &&
-        activeSession.hasSignedIn
-      ) {
-        handleEndSession();
-      }
-    };
-
-    // Initial update
-    updateTimer();
-
-    // Set interval
-    const interval = setInterval(updateTimer, 1000);
-
-    return () => clearInterval(interval);
-  }, [activeSession, calculateTimeLeft]);
-
   const handleCreateSession = async () => {
     setIsLoading(true);
     const result = await createSession({
@@ -177,6 +150,33 @@ export const CourseCard = ({
     },
     []
   );
+
+  // Timer effect with useCallback for cleanup
+  useEffect(() => {
+    if (!activeSession) return;
+
+    const updateTimer = () => {
+      const newTimeLeft = calculateTimeLeft();
+      setTimeLeft(newTimeLeft);
+
+      // Auto-end session when both OTPs expire
+      if (
+        newTimeLeft.signIn === 0 &&
+        newTimeLeft.signOut === 0 &&
+        activeSession.hasSignedIn
+      ) {
+        handleEndSession();
+      }
+    };
+
+    // Initial update
+    updateTimer();
+
+    // Set interval
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, [activeSession, calculateTimeLeft, handleEndSession]);
 
   return (
     <Card className="shadow-lg hover:shadow-xl transition-all duration-300 border-2">
