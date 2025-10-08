@@ -2,107 +2,171 @@ import type { Request, Response } from "express";
 import db from "../config/db";
 import { generateOtp } from "../libs/helpers";
 import AppError from "../libs/utils/AppError";
-import { markAttendance } from "../libs/utils/db";
+// import { markAttendance } from "../libs/utils/db";
 import { sendError, sendSuccess } from "../libs/utils/response";
+import { AuthenticatedRequest } from 'src/types/auth';
 // import type { TablesInsert } from "../types/database";
 
-// Create a new session (sign-in or sign-out)
-// POST /sessions
-export const createSession = async (req: Request, res: Response) => {
-	try {
-		const { courseId, lecturerId, type = "SIGN_IN" } = req.body || {};
+const SESSION_EXPIRY_MS = 10 * 60 * 1000; // 10 mins
 
-		if (!courseId || !lecturerId)
-			throw new AppError("Please provide valid course and lecturer ID");
+const isSessionExpired = (createdAt: string) =>
+  new Date(createdAt).getTime() + SESSION_EXPIRY_MS < Date.now();
 
-		// Check if an active session already exists
-		const { data: existing } = await db
-			.from("sessions")
-			.select("*")
-			.eq("course_id", courseId)
-			.eq("lecturer_id", lecturerId)
-			.eq("type", type)
-			.eq("is_active", true)
-			.gte("expires_at", new Date().toISOString())
-			.maybeSingle();
+// --- Create new class session ---
+export const createSession = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const lecturerId = req.user?.id;
+    const { courseId } = req.body;
 
-		if (existing) {
+    if (!lecturerId || !courseId)
+      throw new AppError("Please provide valid course and lecturer ID");
+
+    // ✅ Verify course belongs to lecturer
+    const { data: course, error: courseErr } = await db
+      .from("lecturer_courses")
+      .select("*")
+      .eq("course_id", courseId)
+      .eq("lecturer_id", lecturerId)
+      .maybeSingle();
+
+    if (courseErr) throw new AppError((courseErr as Error).message);
+    if (!course)
+      throw new AppError("Course not found or not assigned to this lecturer", 404);
+
+    // ✅ Check if there's an active valid session
+    const { data: existing, error: sessionErr} = await db
+      .from("sessions")
+      .select("*")
+      .eq("course_id", courseId)
+      .eq("lecturer_id", lecturerId)
+      .eq("is_active", true)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+		if(sessionErr) throw new AppError((sessionErr as Error).message)
+    if (existing && !isSessionExpired(existing.created_at!)) {
+      return sendSuccess(res, existing, "An active class session already exists.");
+    }
+
+    // ✅ Generate new OTPs
+    const signInOtp = generateOtp();
+    // const signOutOtp = generateOtp();
+
+    // ✅ Create new session
+    const { data: session, error } = await db
+      .from("sessions")
+      .insert({
+        course_id: Number(courseId),
+        lecturer_id: Number(lecturerId),
+        sign_in_otp: signInOtp.toString(),
+        is_active: true,
+				created_at: new Date().toISOString(),
+				updated_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+		if(!session) throw new AppError("Unable to create session")
+    if (error) throw new AppError(error);
+
+    return sendSuccess(res, {...session, success: true}, "Class session created successfully");
+  } catch (error) {
+    sendError(error, res);
+  }
+};
+
+// --- Verify OTP (sign-in / sign-out) ---
+export const verifySession = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const studentId = req.user?.id;
+    if (!studentId) throw new AppError("Unauthorized", 401);
+
+    const { otp, type, course_id, session_id } = req.body; // type: "SIGN_IN" | "SIGN_OUT"
+    if (!otp || !type) throw new AppError("OTP and type are required");
+
+		if(!course_id) throw new AppError("Please provide valid course id")
+
+		if(type === "SIGN_OUT" && (!session_id || typeof session_id !== "number")){
+			throw new AppError("Please provide valid session id")
+		}
+
+    // ✅ Find valid active session for OTP
+    const otpColumn = type === "SIGN_OUT" ? "sign_out_otp" : "sign_in_otp";
+    if(type === "SIGN_IN"){
+			 const { data: session, error } = await db
+				.from("sessions")
+				.select("*")
+				.eq("course_id", course_id)
+				// .eq("id", session_id)
+				.eq("is_active", true)
+				.maybeSingle();
+
+			if (error) throw new AppError(error.message);
+			if (!session) throw new AppError("Invalid or inactive session", 400);
+
+			if(session[otpColumn] !== otp) throw new AppError("Invalid OTP", 400)
+			if (isSessionExpired(session.updated_at!)) {
+				// Optionally deactivate expired session
+				await db.from("sessions").update({ is_active: false }).eq("id", session.id);
+				throw new AppError("Session has expired, you're late.");
+			}
+
+			// ✅ (Optional) Record attendance here
+
 			return sendSuccess(res, {
-				otp: existing.otp,
-				message: "An active session already exists with this OTP.",
+				sessionId: session.id,
+				success: true,
+				message: `Successfully signed in for class.`,
 			});
 		}
 
-		const otp = generateOtp();
+    const { data: session, error } = await db
+      .from("sessions")
+      .select("*")
+      .eq("course_id", Number(course_id))
+      .eq("id", Number(session_id))
+      // .eq("is_active", true)
+      .maybeSingle();
+		console.log(session)
+    if (error) throw new AppError(error.message);
+    if (!session) throw new AppError("Invalid or inactive session", 400);
 
-		const { data: newSession, error } = await db
-			.from("sessions")
-			.insert({
-				course_id: Number(courseId),
-				lecturer_id: Number(lecturerId),
-				otp: String(otp),
-				type,
-				expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(), // 10 minutes from now
-				is_active: true,
-			})
-			.select()
-			.single();
+		// if(session.sign_out_otp != otp) throw new AppError("Invalid OTP", 400)
+    // if (isSessionExpired(session.updated_at!)) {
+    //   // Optionally deactivate expired session
+    //   await db.from("sessions").update({ is_active: false }).eq("id", session.id);
+    //   throw new AppError("Session has expired, you're late.");
+    // }
 
-		if (error) throw error;
+		if(!session.is_active) throw new AppError("Session is not active, you're late.", 400)
 
-		return sendSuccess(res, newSession);
-	} catch (error) {
-		sendError(error, res);
-	}
-};
+    // ✅ (Optional) Record attendance here
 
-// Verify session OTP and mark attendance
-// POST /sessions/verify
-export const verifySession = async (req: Request, res: Response) => {
-	try {
-		const { studentId, otp } = req.body;
-
-		if (!studentId || !otp)
-			throw new AppError("Student ID and OTP are required");
-
-		// const { data: session } = await db
-		//   .from("sessions")
-		//   .select("*")
-		//   .eq("otp", otp)
-		//   .eq("is_active", true)
-		//   .gte("expires_at", new Date().toISOString())
-		//   .single();
-
-		// if (!session) throw new AppError("Invalid or expired OTP");
-
-		// // Record attendance
-		// const { error: attendanceErr } = await db.from("attendances").insert({
-		//   session_id: session.id,
-		//   student_id: studentId,
-		//   status: "PRESENT",
-		// });
-
-		// if (attendanceErr) throw attendanceErr;
-		const attendance = await markAttendance(studentId, otp);
-		if (!attendance) throw new AppError("Invalid or expired OTP");
-
-		return sendSuccess(res, { message: "Attendance recorded successfully." });
-	} catch (error) {
-		sendError(error, res);
-	}
+    return sendSuccess(res, {
+      sessionId: session.id,
+      success: true,
+      message: `Successfully signed out for class.`,
+    });
+  } catch (error) {
+    sendError(error, res);
+  }
 };
 
 // End an active session
 // PUT /sessions/:sessionId/end
-export const endSession = async (req: Request, res: Response) => {
+export const endSession = async (req: AuthenticatedRequest, res: Response) => {
 	try {
+		const lecturerId = req.user?.id;
+		if (!lecturerId) throw new AppError("Unauthorized", 401);
+
 		const { sessionId } = req.params;
 		if (!sessionId) throw new AppError("Please Provide Valid Session Id");
 
 		const { error } = await db
 			.from("sessions")
 			.update({ is_active: false })
-			.eq("id", Number(sessionId));
+			.eq("id", Number(sessionId))
+			.eq("lecturer_id", lecturerId)
 
 		if (error) throw error;
 
@@ -171,6 +235,77 @@ export const getSessionAttendances = async (req: Request, res: Response) => {
 		if (error) throw error;
 
 		return sendSuccess(res, data);
+	} catch (error) {
+		sendError(error, res);
+	}
+};
+
+// Get active session for a lecturer
+// GET /sessions/active
+export const getActiveSessions = async (req: AuthenticatedRequest, res: Response) => {
+	try {
+		const lecturerId = req.user?.id;
+		if (!lecturerId) throw new AppError("Unauthorized", 401);
+
+		const { data: sessions, error } = await db
+			.from("sessions")
+			.select("*")
+			.eq("lecturer_id", lecturerId)
+			.eq("is_active", true)
+			.order("created_at", { ascending: false })
+
+
+		if (error) throw new AppError(error.message);
+
+		if (!sessions) {
+			throw new AppError("No active session found.", 404);
+		}
+
+		return sendSuccess(res, sessions);
+	} catch (error) {
+		sendError(error, res);
+	}
+};
+
+// Put sign-out OTP for a session
+// PUT /sessions/:sessionId/sign-out-otp
+export const getSignOutOtp = async (req: AuthenticatedRequest, res: Response) => {
+	try {
+		console.log("YAY!!")
+		const lecturerId = req.user?.id;
+		if (!lecturerId) throw new AppError("Unauthorized", 401);
+
+		const { sessionId } = req.params;
+		// const { courseId } = req.body
+
+		if (!sessionId) throw new AppError("Please provide a valid session ID", 400);
+		// if (!courseId) throw new AppError("Please provide a valid course ID", 400);
+
+		// const { data: session, error } = await db
+		// 	.from("sessions")
+		// 	.select("sign_out_otp, lecturer_id")
+		// 	.eq("id", Number(sessionId))
+		// 	.single();
+
+		const signOutOtp = generateOtp();
+
+		const { data: session, error } = await db
+			.from("sessions")
+			.update({
+				sign_out_otp: signOutOtp.toString(),
+				updated_at: new Date().toISOString()
+			})
+			.eq("id", Number(sessionId))
+			.eq("lecturer_id", lecturerId)
+			// .eq("course_id", Number(courseId))
+			.select("sign_out_otp")
+			.single();
+
+
+		if (error) throw error;
+		if (!session) throw new AppError("Session not found", 404);
+
+		return sendSuccess(res, { sign_out_otp: session.sign_out_otp });
 	} catch (error) {
 		sendError(error, res);
 	}

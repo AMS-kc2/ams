@@ -18,40 +18,43 @@ export type Database = {
         Row: {
           course_id: number
           id: number
+          location: string | null
           session_id: number
-          status: string | null
+          sign_in_time: string | null
+          sign_out_time: string | null
           student_id: number
-          verified_at: string | null
         }
         Insert: {
           course_id: number
           id?: number
+          location?: string | null
           session_id: number
-          status?: string | null
+          sign_in_time?: string | null
+          sign_out_time?: string | null
           student_id: number
-          verified_at?: string | null
         }
         Update: {
           course_id?: number
           id?: number
+          location?: string | null
           session_id?: number
-          status?: string | null
+          sign_in_time?: string | null
+          sign_out_time?: string | null
           student_id?: number
-          verified_at?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "attendances_course_id_fkey"
             columns: ["course_id"]
             isOneToOne: false
-            referencedRelation: "courses"
-            referencedColumns: ["id"]
+            referencedRelation: "course_attendance_summary"
+            referencedColumns: ["course_id"]
           },
           {
-            foreignKeyName: "attendances_session_id_fkey"
-            columns: ["session_id"]
+            foreignKeyName: "attendances_course_id_fkey"
+            columns: ["course_id"]
             isOneToOne: false
-            referencedRelation: "sessions"
+            referencedRelation: "courses"
             referencedColumns: ["id"]
           },
           {
@@ -63,12 +66,50 @@ export type Database = {
           },
         ]
       }
+      course_attendances: {
+        Row: {
+          attendance_id: number
+          course_id: number
+        }
+        Insert: {
+          attendance_id: number
+          course_id: number
+        }
+        Update: {
+          attendance_id?: number
+          course_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_attendances_attendance_id_fkey"
+            columns: ["attendance_id"]
+            isOneToOne: false
+            referencedRelation: "attendances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_attendances_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "course_attendance_summary"
+            referencedColumns: ["course_id"]
+          },
+          {
+            foreignKeyName: "course_attendances_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           code: string
           created_at: string | null
           id: number
           level: string
+          no_of_students: number
           semester: string
           title: string
         }
@@ -77,6 +118,7 @@ export type Database = {
           created_at?: string | null
           id?: number
           level: string
+          no_of_students: number
           semester: string
           title: string
         }
@@ -85,6 +127,7 @@ export type Database = {
           created_at?: string | null
           id?: number
           level?: string
+          no_of_students?: number
           semester?: string
           title?: string
         }
@@ -108,6 +151,13 @@ export type Database = {
             foreignKeyName: "lecturer_courses_course_id_fkey"
             columns: ["course_id"]
             isOneToOne: false
+            referencedRelation: "course_attendance_summary"
+            referencedColumns: ["course_id"]
+          },
+          {
+            foreignKeyName: "lecturer_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
             referencedRelation: "courses"
             referencedColumns: ["id"]
           },
@@ -122,31 +172,34 @@ export type Database = {
       }
       lecturers: {
         Row: {
-          courses: string[]
+          courses: number[]
+          department: string
+          full_name: string
           id: number
           lecturer_id: string
           level: string
           password: string
           semester: string
-          total_classes: number
         }
         Insert: {
-          courses: string[]
+          courses: number[]
+          department: string
+          full_name: string
           id?: number
           lecturer_id: string
           level: string
           password: string
           semester: string
-          total_classes: number
         }
         Update: {
-          courses?: string[]
+          courses?: number[]
+          department?: string
+          full_name?: string
           id?: number
           lecturer_id?: string
           level?: string
           password?: string
           semester?: string
-          total_classes?: number
         }
         Relationships: []
       }
@@ -154,34 +207,41 @@ export type Database = {
         Row: {
           course_id: number
           created_at: string | null
-          expires_at: string
           id: number
           is_active: boolean | null
           lecturer_id: number
-          otp: string
-          type: string
+          sign_in_otp: string
+          sign_out_otp: string | null
+          updated_at: string | null
         }
         Insert: {
           course_id: number
           created_at?: string | null
-          expires_at: string
           id?: number
           is_active?: boolean | null
           lecturer_id: number
-          otp: string
-          type?: string
+          sign_in_otp: string
+          sign_out_otp?: string | null
+          updated_at?: string | null
         }
         Update: {
           course_id?: number
           created_at?: string | null
-          expires_at?: string
           id?: number
           is_active?: boolean | null
           lecturer_id?: number
-          otp?: string
-          type?: string
+          sign_in_otp?: string
+          sign_out_otp?: string | null
+          updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "sessions_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "course_attendance_summary"
+            referencedColumns: ["course_id"]
+          },
           {
             foreignKeyName: "sessions_course_id_fkey"
             columns: ["course_id"]
@@ -212,6 +272,13 @@ export type Database = {
           student_id?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "student_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "course_attendance_summary"
+            referencedColumns: ["course_id"]
+          },
           {
             foreignKeyName: "student_courses_course_id_fkey"
             columns: ["course_id"]
@@ -284,10 +351,35 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      course_attendance_summary: {
+        Row: {
+          attendance_rate: number | null
+          code: string | null
+          course_id: number | null
+          lecturer_id: number | null
+          level: string | null
+          semester: string | null
+          student_count: number | null
+          title: string | null
+          total_attendances: number | null
+          total_sessions: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sessions_lecturer_id_fkey"
+            columns: ["lecturer_id"]
+            isOneToOne: false
+            referencedRelation: "lecturers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
-      [_ in never]: never
+      get_student_dashboard: {
+        Args: { p_student_id: number }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never

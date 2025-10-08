@@ -6,10 +6,10 @@ const LecturerOnboardingPage = () => {
     <div className="w-full h-screen flex items-center justify-center">
       <div className="p-5 space-y-8">
         <p className="text-lg font-semibold">
-          Welcome, <span className="text-xl font">DR. AHMED RAFIU</span>
+          Welcome To KCS Attendance Management System
         </p>
         <Button asChild variant="link">
-          <Link href="/lecturer/dashboard"> Continue to Dashboard </Link>
+          <Link href="/lecturer/dashboard"> Continue to Your Dashboard </Link>
         </Button>
       </div>
     </div>

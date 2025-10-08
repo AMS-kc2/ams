@@ -19,48 +19,38 @@ export async function enrollStudentInCourse(
 	return data;
 }
 
-export async function markAttendance(student_id: number, otp: string) {
-	// Find active session with OTP
-	const { data: session, error: findErr } = await db
-		.from("sessions")
-		.select("*")
-		.eq("otp", otp)
-		// .eq("is_active", true)
-		.single();
+// export async function markAttendance(
+// 	student_id: number,
+// 	session_id: number,
+// ) {
 
-	if (findErr || !session) throw new Error("Invalid or expired OTP");
+// 	// Check if attendance already marked
+// 	const { data: existingAttendance } = await db
+// 		.from("attendances")
+// 		.select("*")
+// 		.eq("session_id", session_id)
+// 		.eq("student_id", student_id)
+// 		.single();
 
-	if (session.expires_at < new Date().toISOString())
-		throw new Error("Session has expired, You're late");
-	if (!session.is_active) throw new Error("Session is no longer active");
+// 	if (existingAttendance)
+// 		throw new Error("Attendance already marked for this session");
 
-	// Check if attendance already marked
-	const { data: existingAttendance } = await db
-		.from("attendances")
-		.select("*")
-		.eq("session_id", session.id)
-		.eq("student_id", student_id)
-		.single();
+// 	// Mark attendance
 
-	if (existingAttendance)
-		throw new Error("Attendance already marked for this session");
+// 	const { data, error } = await db
+// 		.from("attendances")
+// 		.insert({
+// 			student_id,
+// 			session_id: session.id,
+// 			status: "present",
+// 			course_id: session.course_id,
+// 		})
+// 		.select()
+// 		.single();
 
-	// Mark attendance
-
-	const { data, error } = await db
-		.from("attendances")
-		.insert({
-			student_id,
-			session_id: session.id,
-			status: "present",
-			course_id: session.course_id,
-		})
-		.select()
-		.single();
-
-	if (error) throw error;
-	return data;
-}
+// 	if (error) throw error;
+// 	return data;
+// }
 
 export async function addLecturerToCourse(
 	lecturer_id: number,

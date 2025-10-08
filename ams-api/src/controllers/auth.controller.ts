@@ -15,54 +15,72 @@ import {
 import { COOKIE_NAME } from "../types/auth";
 
 // ====================== STUDENTS ======================
-
 export const studentSignup = async (req: Request, res: Response) => {
 	try {
-		const payload = await studentSignupSchema.parseAsync(req.body);
-		const { matricNumber, surname, level, semester } = payload;
+		// 1️⃣ Validate input
+		const { matricNumber, surname, level, semester } =
+			await studentSignupSchema.parseAsync(req.body);
 
-		const existingStudent = await db
+		// 2️⃣ Check if student already exists (fetch minimal fields only)
+		const { data: existingStudent, error: existingError } = await db
 			.from("students")
-			.select("*")
+			.select("id")
 			.eq("matric_number", matricNumber)
-			.single();
+			.maybeSingle();
 
-		if (existingStudent) {
-			throw new AppError("Student already exists");
-		}
+		if (existingError)
+			throw new AppError(existingError.message || "Error checking existing student");
 
-		const { data, error } = await db
+		if (existingStudent)
+			throw new AppError("Student already exists", 400);
+
+		// 3️⃣ Insert new student record
+		const { data: student, error: insertError } = await db
 			.from("students")
 			.insert({
-				matric_number: matricNumber,
-				surname: surname.toLowerCase(),
+				matric_number: matricNumber.trim(),
+				surname: surname.trim().toLowerCase(),
 				level,
 				semester,
 			})
 			.select()
 			.single();
 
-		if (error) throw new AppError(error.message);
+		if (insertError || !student)
+			throw new AppError(insertError?.message ?? "Student creation failed");
 
-		return sendSuccess(res, data, "Student created", 201);
+		// 4️⃣ Return success
+		return sendSuccess(res, student, "Student created successfully", 201);
 	} catch (err) {
 		return sendError(err, res);
 	}
 };
+
 
 export const studentLogin = async (req: Request, res: Response) => {
 	try {
 		const payload = await studentLoginSchema.parseAsync(req.body);
 		const { matricNumber, surname } = payload;
 
-		const { data: student, error } = await db
+		const { data: students, error } = await db
 			.from("students")
 			.select("*")
 			.eq("matric_number", matricNumber)
-			.single();
 
-		if (error) throw new AppError(error.message);
-		if (!student) throw new AppError(`No Student with id: ${matricNumber}`);
+    // ✅ Handle errors from Supabase
+    if (error) throw new AppError(error.message);
+
+    // ✅ Handle no records
+    if (!students || students.length === 0)
+      throw new AppError("Student not found", 404);
+
+    // ✅ Handle duplicate records gracefully
+    if (students.length > 1) {
+      console.warn(`⚠ Duplicate student records found for ${matricNumber}-> ${students}`);
+		}
+
+      // Option 1 — pick the latest (assuming "created_at" exists)
+      const student = students[0];
 
 		if (student.surname !== surname.toLowerCase()) {
 			throw new AppError("you've forgotten your surname? What a bad son");
@@ -79,8 +97,10 @@ export const studentLogin = async (req: Request, res: Response) => {
 		res.cookie(COOKIE_NAME, token, {
 			maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
 			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			sameSite: "lax",
+			// secure: process.env.NODE_ENV === "production",
+			// sameSite: "lax",
+			sameSite: "none",
+			secure: true,
 		});
 
 		return sendSuccess(res, student, "Student logged in", 200);
@@ -89,24 +109,33 @@ export const studentLogin = async (req: Request, res: Response) => {
 	}
 };
 
+
 // ====================== LECTURERS ======================
 
 export const lecturerSignUp = async (req: Request, res: Response) => {
 	try {
-		const { lecturerId, password, level, courses, semester, totalClasses } =
+		// 1️⃣ Validate Input
+		const { lecturerId, password, level, courses, semester, fullName, department} =
 			await lecturerSignupSchema.parseAsync(req.body);
 
-		const existingLecturer = await db
+		// 2️⃣ Check if Lecturer Already Exists
+		const { data: existingLecturer, error: existingError } = await db
 			.from("lecturers")
-			.select("*")
+			.select("id")
 			.eq("lecturer_id", lecturerId)
-			.single();
+			.maybeSingle();
 
-		if (existingLecturer) throw new AppError("Lecturer already exists");
+		if (existingError)
+			throw new AppError(existingError.message || "Error checking existing lecturer");
 
+		if (existingLecturer)
+			throw new AppError("Lecturer already exists", 400);
+
+		// 3️⃣ Hash Password
 		const passwordHash = await hash(password);
 
-		const { data, error } = await db
+		// 4️⃣ Start Transaction (Atomic Insert)
+		const { data: newLecturer, error: lecturerError } = await db
 			.from("lecturers")
 			.insert({
 				lecturer_id: lecturerId,
@@ -114,19 +143,35 @@ export const lecturerSignUp = async (req: Request, res: Response) => {
 				courses,
 				level,
 				semester,
-				total_classes: totalClasses,
+				full_name: fullName,
+				department
 			})
 			.select()
 			.single();
 
-		if (error) throw new AppError(error.message);
+		if (lecturerError || !newLecturer)
+			throw new AppError(lecturerError?.message ?? "Failed to create lecturer");
 
-		return sendSuccess(res, data, "Lecturer created", 201);
+		// 5️⃣ Batch Insert Course Relations (safe, single call)
+		const courseLinks = courses.map((courseId) => ({
+			course_id: courseId,
+			lecturer_id: newLecturer.id,
+		}));
+
+		const { error: linkError } = await db
+			.from("lecturer_courses")
+			.insert(courseLinks);
+
+		if (linkError)
+			throw new AppError(linkError.message ?? "Failed to assign courses");
+
+		// 6️⃣ Return Success Response
+		return sendSuccess(res, newLecturer, "Lecturer created successfully", 201);
+
 	} catch (error) {
 		return sendError(error, res);
 	}
 };
-
 export const lecturerLogin = async (req: Request, res: Response) => {
 	try {
 		const { password, lecturerId } = await lecturerLoginSchema.parseAsync(
@@ -158,8 +203,10 @@ export const lecturerLogin = async (req: Request, res: Response) => {
 		res.cookie(COOKIE_NAME, token, {
 			maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
 			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			sameSite: "lax",
+			// secure: process.env.NODE_ENV === "production",
+			// sameSite: "lax",
+			sameSite: "none",
+			secure: true,
 		});
 
 		return sendSuccess(res, lecturer, "Lecturer logged in", 200);
@@ -167,3 +214,14 @@ export const lecturerLogin = async (req: Request, res: Response) => {
 		return sendError(error, res);
 	}
 };
+
+export const logout = async (_: Request, res: Response) => {
+	try {
+		res.clearCookie(COOKIE_NAME);
+		return sendSuccess(res, null, "Logged out successfully");
+	} catch (error) {
+		return sendError(error, res);
+	}
+};
+
+//

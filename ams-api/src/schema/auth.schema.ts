@@ -40,19 +40,22 @@ export const lecturerLoginSchema = z.object({
 export const lecturerSignupSchema = z
 	.object({
 		lecturerId: z.string().min(3, { message: "Enter a valid lecturer id" }),
+		fullName: z
+      .string()
+      .min(3, "Enter a valid name")
+      .refine((val) => val.trim().split(/\s+/).length >= 2, {
+        message: "Enter your full name (at least two Names)",
+      }),
 		password: z
 			.string()
 			.min(8, { message: "Password must be at least 8 characters" }),
 		confirmPassword: z.string().min(8),
+    department: z.string().min(1, "Department is required"),
 		level: z.enum(["100", "200", "300", "400", "500"]),
 		semester: z.enum(["1st", "2nd"]),
 		courses: z
-			.array(z.string())
+			.array(z.number())
 			.min(1, { message: "Select at least one course" }),
-		totalClasses: z
-			.number()
-			.min(1, { message: "Must be at least 1" })
-			.max(365, { message: "Too many classes" }),
 	})
 	.refine((d) => d.password === d.confirmPassword, {
 		message: "Passwords do not match",

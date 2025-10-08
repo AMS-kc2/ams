@@ -22,7 +22,7 @@ router.get(
 );
 
 // GET /courses/:courseId
-router.get("/:id", courseController.getCourseWithId);
+router.get("/:id", authenticateJWT, courseController.getCourseWithId);
 
 // POST /courses
 router.post("/", courseController.createCourse);
@@ -32,5 +32,23 @@ router.delete("/:id", authenticateJWT, courseController.deleteCourse);
 
 // PUT /courses/:id
 router.put("/:id", authenticateJWT, courseController.updateCourse);
+
+//GET /courses/:courseId/attendance/stats
+router.get("/:courseId/attendance/stats",
+	authenticateJWT,
+	courseController.getCourseAttendanceStats
+);
+
+//GET /courses/:courseId/attendance/students?page=1&limit=20
+router.get("/:courseId/attendance/students",
+	authenticateJWT,
+	courseController.getCourseAttendanceStudents
+);
+
+//GET /courses/:courseId/attendance/sessions?page=1&limit=20
+router.get("/:courseId/attendance/sessions",
+	authenticateJWT,
+	courseController.getCourseAttendanceSessions
+);
 
 export default router;

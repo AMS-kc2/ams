@@ -15,7 +15,7 @@ axiosInstance.interceptors.response.use(
     const resData = response.data;
 
     // If your API always returns { success, data, message }
-    if (resData?.success === false) {
+    if (resData?.status === "error") {
       console.warn("[API ERROR]", resData.message);
       return Promise.reject(resData.message || "Request failed");
     }
@@ -27,15 +27,15 @@ axiosInstance.interceptors.response.use(
     if (error.response) {
       // Server responded with non-2xx status
       const errData: any = error.response.data;
-      console.error("[API RESPONSE ERROR]", errData?.message || error.message);
+      console.warn("[API RESPONSE ERROR]", errData?.message || error.message);
       return Promise.reject(errData?.message || "Server error");
     } else if (error.request) {
       // No response
-      console.error("[API NETWORK ERROR]", error.message);
+      console.warn("[API NETWORK ERROR]", error.message);
       return Promise.reject("Network error, please check your connection");
     } else {
       // Axios internal error
-      console.error("[API CONFIG ERROR]", error.message);
+      console.warn("[API CONFIG ERROR]", error.message);
       return Promise.reject(error.message);
     }
   }

@@ -60,6 +60,7 @@ export default function LoginPage() {
   const onSubmit = async (data: LecturerFormData | StudentFormData) => {
     try {
       // Only send relevant data based on role
+      console.log(data);
       const formData =
         role === "lecturer"
           ? {
@@ -71,12 +72,16 @@ export default function LoginPage() {
               surname: (data as StudentFormData).surname,
             };
 
-      await axiosInstance.post(`/auth/${role}/log-in`, formData);
+      const res = await axiosInstance.post(`/auth/${role}/log-in`, formData, {
+        withCredentials: true,
+      });
+      console.log(res);
+      toast((res as any)?.message as string);
       router.push(
         role === "lecturer" ? "/lecturer/dashboard" : "/student/dashboard"
       );
     } catch (error) {
-      toast(error as string);
+      toast(("Failed to login [BAD]:" + error) as string);
     }
   };
 

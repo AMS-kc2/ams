@@ -46,9 +46,9 @@
 //   return { data, loading, error, refetch: fetchData };
 // }
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axiosInstance from '@/lib/axios';
-import { AxiosRequestConfig } from 'axios';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import axiosInstance from "@/lib/axios";
+import { AxiosRequestConfig } from "axios";
 
 // Generic GET hook
 export function useFetch<T>(
@@ -59,20 +59,25 @@ export function useFetch<T>(
   return useQuery<T>({
     queryKey: key,
     queryFn: async () => {
-      const response = await axiosInstance.get<T>(url, config);
+      const response = await axiosInstance.get<T>(url, {
+        ...config,
+        withCredentials: true,
+      });
       return response as T;
     },
   });
 }
 
 export function useMutate<TData, TVariables>(
-  method: 'post' | 'put' | 'delete' | 'patch'
+  method: "post" | "put" | "delete" | "patch"
 ) {
   const queryClient = useQueryClient();
 
   return useMutation<TData, Error, TVariables & { url: string }>({
     mutationFn: async ({ url, ...data }) => {
-      const response = await axiosInstance[method](url, data);
+      const response = await axiosInstance[method](url, data, {
+        withCredentials: true,
+      });
       return response as TData;
     },
     onSuccess: () => {

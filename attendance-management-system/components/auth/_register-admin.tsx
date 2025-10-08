@@ -213,7 +213,7 @@ export default function RegisterAdmin() {
             setFocus(firstField);
           } catch (err) {
             /* ignore if focus can't be set */
-            console.error(err);
+            console.warn(err);
           }
         }
         // move user to the step that failed

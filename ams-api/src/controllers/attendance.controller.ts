@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import db from "../config/db";
 import AppError from "../libs/utils/AppError";
 import { sendError, sendSuccess } from "../libs/utils/response";
+import { AuthenticatedRequest } from 'src/types/auth';
 // import { markAttendance } from 'libs/utils/db';
 
 // Get all attendance for a specific course with pagination
@@ -58,6 +59,57 @@ export const getAllAttendanceForCourseAndStudent = async (
 		sendError(error, res);
 	}
 };
+
+// Create Attendance
+// POST /attendances
+// Body: { sessionId: number, studentId: number }
+export const createAttendance = async (req: AuthenticatedRequest, res: Response) => {
+	try {
+
+		const studentId = req.user?.id;
+		if (!studentId) throw new AppError("Unauthorized", 401);
+
+		const { course_id,session_id, student_id,signInTime, signOutTime, location, } = req.body
+
+		if (!course_id || !session_id) throw new AppError("Please Provide Valid Course Id and Session Id");
+		if(!student_id) throw new AppError("Please Provide Valid Student Id");
+		if(!signInTime) throw new AppError("Please Provide Valid Sign In Time");
+		if(!signOutTime) throw new AppError("Please Provide Valid Sign Out Time");
+		if(studentId !== student_id) throw new AppError("Unauthorized, Thief", 401)
+		// if(!location) throw new AppError("Please Provide Valid Location");
+
+		const { data: existingAttendance } = await db
+		.from("attendances")
+		.select("id")
+		.eq("session_id", session_id)
+		.eq("student_id", student_id)
+		.eq("course_id", course_id)
+		.maybeSingle();
+
+	if (existingAttendance)
+		throw new Error("Attendance already marked for this session");
+
+	// Mark attendance
+	const { data, error } = await db
+		.from("attendances")
+		.insert({
+			student_id,
+			session_id: session_id,
+			course_id: course_id,
+			sign_in_time: signInTime,
+			sign_out_time: signOutTime,
+			location,
+		})
+		.select()
+		.single();
+
+		if (error) throw new AppError(error.message);
+		return sendSuccess(res, { data });
+
+	} catch (error) {
+		sendError(error, res);
+	}
+}
 
 // Mark attendance for a student in a session
 // POST /attendances/mark

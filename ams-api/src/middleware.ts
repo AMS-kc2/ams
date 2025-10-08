@@ -14,8 +14,7 @@ export const authenticateJWT = (
 	res: Response,
 	next: NextFunction,
 ) => {
-	const token = req.cookies[COOKIE_NAME];
-
+const token = req.cookies[COOKIE_NAME];
 	if (!token) {
 		// return res.status(401).json({ message: "Unauthorized: No token provided" });
 		return sendError(new AppError("Unauthorized: No token provided", 401), res);

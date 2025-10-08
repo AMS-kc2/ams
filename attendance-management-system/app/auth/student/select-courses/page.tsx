@@ -1,27 +1,75 @@
 "use client";
 
+import { Course } from "@/components/auth/register-admin/schema";
+import Loading from "@/components/loading";
 import OnboardingForm from "@/components/students/onboardingform";
 import { Button } from "@/components/ui/button";
-import { COURSES } from "@/constants";
+// import { COURSES } from "@/constants";
+import { useFetch } from "@/hooks/use-api";
+import axiosInstance from "@/lib/axios";
 import { Search } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
 
 const SelectCoursesPage = () => {
+  const queryKey = useMemo(() => ["courses"], []);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
 
-  // Setup debounced search term if needed for performance optimization
   const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
+  const router = useRouter();
 
-  //setup the filtered courses based on the search term
   const filteredCourses = debouncedSearchTerm
-    ? COURSES.filter((course) => !selectedCourses.includes(course)).filter(
-        (course) =>
-          course.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+    ? courses.filter(
+        (c) =>
+          c.code.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+          c.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
       )
-    : COURSES.filter((course) => !selectedCourses.includes(course));
+    : courses;
+
+  const { data, isLoading, isError } = useFetch<{ courses: Course[] }>(
+    queryKey,
+    "/courses"
+  );
+
+  const onsubmit = async () => {
+    try {
+      await axiosInstance.post(
+        "/students/register-courses",
+        {
+          course_ids: selectedCourses,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      toast("Successfully registered");
+      router.push("/student/dashboard");
+    } catch (error) {
+      toast.error("Error occured while registering" + (error as Error).message);
+    }
+  };
+
+  useEffect(() => {
+    console.log(data);
+    if (data?.courses) {
+      setCourses(data.courses);
+    }
+  }, [data]);
+
+  if (isLoading) return <Loading />;
+  if (isError)
+    return (
+      <div className="h-screen flex flex-col gap-4 items-center justify-center text-center text-slate-500">
+        Something went wrong. Please try again later.
+        <span>Try refresh</span>
+        <Button onClick={() => router.refresh()}>Refresh</Button>
+      </div>
+    );
 
   return (
     <div className="min-h-screen max-w-xl relative flex items-center flex-col gap-5 mx-auto py-20 px-5">
@@ -47,17 +95,17 @@ const SelectCoursesPage = () => {
       </div>
       <OnboardingForm
         courses={filteredCourses}
-        selectedCourses={selectedCourses}
-        setSelectedCourses={setSelectedCourses}
+        selectedCourseIds={selectedCourses}
+        setSelectedCourseIds={setSelectedCourses}
       />
 
       {selectedCourses.length > 0 && (
         <div className="fixed bottom-5 flex items-center justify-center w-full mx-2 p-5 shadow-md bg-transparent rounded-md backdrop-blur-sm ">
-          <Button className="w-full" size="lg" asChild>
-            <Link href="/auth/student/onboarding">
-              Continue with {selectedCourses.length} course
-              {selectedCourses.length !== 1 ? "s" : ""}
-            </Link>
+          <Button className="w-full" size="lg" onClick={onsubmit}>
+            {/* <Link href="/auth/student/onboarding"> */}
+            Continue with {selectedCourses.length} course
+            {selectedCourses.length !== 1 ? "s" : ""}
+            {/* </Link> */}
           </Button>
         </div>
       )}

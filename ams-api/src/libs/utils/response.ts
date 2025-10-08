@@ -45,6 +45,8 @@ export const sendSuccess = (
 
 export const sendError = (err: unknown, res: Response) => {
 	const error = buildError(err);
+	console.error(error);
+
 	return res.status(error.statusCode ?? 500).json({
 		status: "error",
 		message: error.isOperational ? error.message : "Something went wrong",

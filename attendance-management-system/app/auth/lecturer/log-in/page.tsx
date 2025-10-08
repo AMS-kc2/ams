@@ -21,6 +21,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axios";
 import { toast } from "sonner";
+import { PasswordInput } from "@/components/ui/password-input";
 
 const formSchema = z.object({
   lecturerId: z.string().min(2, { message: "lecturerId is required" }),
@@ -42,9 +43,11 @@ export default function LecturerLoginPage() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await axiosInstance.post("/auth/lecturer/log-in", data);
+      await axiosInstance.post("/auth/lecturer/log-in", data, {
+        withCredentials: true,
+      });
 
-      router.push("/student/dashboard");
+      router.push("/auth/lecturer/onboarding");
     } catch (error) {
       toast(error as string);
     }
@@ -100,11 +103,7 @@ export default function LecturerLoginPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Enter your password"
-                        {...field}
-                      />
+                      <PasswordInput placeholder="xxxxxxxxx" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

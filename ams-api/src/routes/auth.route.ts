@@ -7,6 +7,7 @@ import {
 	lecturerSignUp,
 	studentLogin,
 	studentSignup,
+	logout,
 } from "../controllers/auth.controller";
 import AppError from "../libs/utils/AppError";
 import { sendError, sendSuccess } from "../libs/utils/response";
@@ -23,8 +24,10 @@ AuthRouter.post("/students/sign-up", studentSignup);
 AuthRouter.post("/lecturer/log-in", lecturerLogin);
 AuthRouter.post("/lecturer/sign-up", lecturerSignUp);
 
+//shared routes
+AuthRouter.post("/logout", logout);
 AuthRouter.get(
-	"/students/user-info",
+	"/user-info",
 	authenticateJWT,
 	(req: AuthenticatedRequest, res: Response) => {
 		// The authenticated user data is available at req.user
