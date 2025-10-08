@@ -34,11 +34,16 @@ app.use(helmet());
 
 // 2️⃣ CORS (tweak origin or use a whitelist in production)
 app.use(
-	cors({
-		origin: ["http://localhost:3000", "https://attendance-ms-2.vercel.app/", "https://attendance-system-ten-psi.vercel.app/"],
-		credentials: true,
-	}),
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://attendance-ms-2.vercel.app",
+      "https://attendance-system-ten-psi.vercel.app",
+    ],
+    credentials: true,
+  })
 );
+
 
 // 3️⃣ Rate limiting (100 reqs per 15m per IP)
 app.use(
@@ -49,6 +54,8 @@ app.use(
 		legacyHeaders: false,
 	}),
 );
+
+app.options("*", cors());
 
 // 4️⃣ Parse JSON + cookies
 app.use(express.json());
