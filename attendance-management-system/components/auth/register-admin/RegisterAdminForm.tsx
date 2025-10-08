@@ -124,7 +124,7 @@ export default function RegisterAdminForm() {
       const fields = STEP_FIELDS[s] ?? [];
       if (fields.length === 0) continue;
 
-      const ok = await trigger(fields as any);
+      const ok = await trigger(fields);
       if (!ok) {
         const firstField = fields[0];
         if (firstField) setFocus(firstField);
@@ -346,7 +346,7 @@ export default function RegisterAdminForm() {
                   Semester
                 </label>
                 <Select
-                  onValueChange={(v) => setValue("semester", v as any)}
+                  onValueChange={(v) => setValue("semester", v as "1st" | "2nd")}
                   defaultValue={watched.semester}
                 >
                   <SelectTrigger>

@@ -1,10 +1,7 @@
 "use client";
 
-import Loading from "@/components/loading";
 // import { useUser } from "@/hooks/use-user";
-import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
-import { toast } from "sonner";
+import React from "react";
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   // const { data: user, isLoading, error } = useUser();

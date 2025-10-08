@@ -76,12 +76,12 @@ export default function LoginPage() {
         withCredentials: true,
       });
       console.log(res);
-      toast((res as any)?.message as string);
+      toast((res as { message: string })?.message);
       router.push(
         role === "lecturer" ? "/lecturer/dashboard" : "/student/dashboard"
       );
     } catch (error) {
-      toast(("Failed to login [BAD]:" + error) as string);
+      toast(`Failed to login: ${error}`);
     }
   };
 

@@ -379,7 +379,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import { useCurrentStudent } from "@/hooks/use-user";

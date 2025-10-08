@@ -55,7 +55,7 @@ export const fetchSessionsAtom = atom(null, async (_, set) => {
       set(sessionsAtom, sessionsMap);
     }
   } catch (error) {
-    toast(error as String);
+    toast(error as string);
     console.warn("Failed to fetch active sessions:", error);
   }
 });
@@ -94,11 +94,11 @@ export const createSessionAtom = atom(
       }
 
       return { success: false, error: "Failed to create session" };
-    } catch (error: any) {
+    } catch (error) {
       console.warn("Error creating session:", error);
       return {
         success: false,
-        error: error.response?.data?.message || error.message || error,
+        error: error as string,
       };
     }
   }
@@ -140,11 +140,11 @@ export const generateSignOutOtpAtom = atom(
       }
 
       return { success: false, error: "Failed to generate sign-out OTP" };
-    } catch (error: any) {
+    } catch (error) {
       console.warn("Error generating sign-out OTP:", error);
       return {
         success: false,
-        error: error.response?.data?.message || error.message || error,
+        error: error as string,
       };
     }
   }
@@ -171,11 +171,10 @@ export const endSessionAtom = atom(null, async (get, set, courseId: number) => {
     set(sessionsAtom, newSessions);
 
     return { success: true };
-  } catch (error: any) {
-    console.warn("Error ending session:", error);
-    return {
-      success: false,
-      error: error.response?.data?.message || error.message || error,
-    };
-  }
-});
+      } catch (error) {
+        console.warn("Error ending session:", error);
+        return {
+          success: false,
+          error: error as string,
+        };
+      }});

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useFetch } from "@/hooks/use-api";
 import axiosInstance from "@/lib/axios";
 import { Search } from "lucide-react";
-import Link from "next/link";
+
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";

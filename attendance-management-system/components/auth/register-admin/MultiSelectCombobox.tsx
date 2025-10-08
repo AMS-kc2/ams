@@ -137,7 +137,7 @@ export function MultiSelectCombobox({
               <CommandEmpty>
                 <div className="p-6 text-center">
                   <p className="text-sm text-slate-600 mb-4">
-                    No courses found matching "{searchQuery}"
+                    No courses found matching &quot;{searchQuery}&quot;
                   </p>
                   <Button
                     size="sm"

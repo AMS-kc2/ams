@@ -84,7 +84,7 @@ export function AddCourseDialog({
           <DialogHeader>
             <DialogTitle>Add New Course</DialogTitle>
             <DialogDescription>
-              Create a new course that's not in the system yet
+              Create a new course that&apos;s not in the system yet
             </DialogDescription>
           </DialogHeader>
 
