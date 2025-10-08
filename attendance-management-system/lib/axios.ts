@@ -26,15 +26,18 @@ axiosInstance.interceptors.response.use(
   (error: AxiosError) => {
     if (error.response) {
       // Server responded with non-2xx status
-      const errData: { message?: string } = error.response.data;
+      const errData: any = error.response.data;
+      console.error("[API RESPONSE ERROR]", errData?.message || error.message);
       console.warn("[API RESPONSE ERROR]", errData?.message || error.message);
       return Promise.reject(errData?.message || "Server error");
     } else if (error.request) {
       // No response
+      console.error("[API NETWORK ERROR]", error.message);
       console.warn("[API NETWORK ERROR]", error.message);
       return Promise.reject("Network error, please check your connection");
     } else {
-      // Axios internal error
+      // Axios internal error      // Axios internal error
+      console.error("[API CONFIG ERROR]", error.message);
       console.warn("[API CONFIG ERROR]", error.message);
       return Promise.reject(error.message);
     }
