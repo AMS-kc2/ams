@@ -22,6 +22,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import axios from "axios";
+import { onSubmitProxy } from "./proxy";
 
 /* -------------------- SCHEMAS -------------------- */
 // Base structure for role switching
@@ -43,7 +44,7 @@ type LecturerFormData = z.infer<typeof lecturerSchema>;
 type StudentFormData = z.infer<typeof studentSchema>;
 
 export default function LoginPage() {
-  const [role, setRole] = useState<"lecturer" | "students">("lecturer");
+  const [role, setRole] = useState<"lecturer" | "student">("lecturer");
   const router = useRouter();
 
   // Pick schema dynamically based on role
@@ -58,32 +59,33 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LecturerFormData | StudentFormData) => {
-    try {
-      const formData =
-        role === "lecturer"
-          ? {
-              lecturerId: (data as LecturerFormData).lecturerId,
-              password: (data as LecturerFormData).password,
-            }
-          : {
-              matricNumber: (data as StudentFormData).matricNumber,
-              surname: (data as StudentFormData).surname,
-            };
+    // try {
+    //   const formData =
+    //     role === "lecturer"
+    //       ? {
+    //           lecturerId: (data as LecturerFormData).lecturerId,
+    //           password: (data as LecturerFormData).password,
+    //         }
+    //       : {
+    //           matricNumber: (data as StudentFormData).matricNumber,
+    //           surname: (data as StudentFormData).surname,
+    //         };
 
-      // 🔹 Call your Next.js proxy route, NOT backend directly
-      const res = await axios.post(`/api/auth/${role}/log-in`, formData, {
-        withCredentials: true, // allow cookies from proxy
-      });
-      console.log(res);
-      toast("Successfully logged in");
+    //   // 🔹 Call your Next.js proxy route, NOT backend directly
+    //   const res = await axios.post(`/api/auth/${role}/log-in`, formData, {
+    //     withCredentials: true, // allow cookies from proxy
+    //   });
+    //   console.log(res);
+    //   toast("Successfully logged in");
 
-      router.push(
-        role === "lecturer" ? "/lecturer/dashboard" : "/student/dashboard"
-      );
-    } catch (error) {
-      console.error("[LOGIN ERROR]", error);
-      toast(`Failed to login: ${error}`);
-    }
+    //   router.push(
+    //     role === "lecturer" ? "/lecturer/dashboard" : "/student/dashboard"
+    //   );
+    // } catch (error) {
+    //   console.error("[LOGIN ERROR]", error);
+    //   toast(`Failed to login: ${error}`);
+    // }
+    await onSubmitProxy(data, role, router);
   };
 
   return (
@@ -98,7 +100,7 @@ export default function LoginPage() {
       <Tabs
         value={role}
         onValueChange={(val: string) => {
-          setRole(val as "lecturer" | "students");
+          setRole(val as "lecturer" | "student");
           form.reset(); // reset fields when switching role
         }}
       >
@@ -120,7 +122,7 @@ export default function LoginPage() {
         <h2 className="mt-6 text-2xl font-semibold tracking-tight text-primary text-pretty">
           Login as {role === "lecturer" ? "Lecturer" : "Student"}
         </h2>
-        {role === "students" && (
+        {role === "student" && (
           <p className="text-sm text-muted-foreground">
             Note: you won&apos;t be able to log out once logged in.
           </p>
