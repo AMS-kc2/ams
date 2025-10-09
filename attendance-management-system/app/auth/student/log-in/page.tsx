@@ -43,7 +43,7 @@ export default function StudentLoginPage() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await axiosInstance.post("/auth/students/log-in", data);
+      await axiosInstance.post("/auth/student/log-in", data);
 
       router.push("/student/dashboard");
     } catch (error) {
