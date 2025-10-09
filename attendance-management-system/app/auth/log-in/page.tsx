@@ -20,8 +20,6 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Book, ChevronLeft, GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import axios from "axios";
 import { onSubmitProxy } from "./proxy";
 
 /* -------------------- SCHEMAS -------------------- */

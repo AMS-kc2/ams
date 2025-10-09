@@ -50,8 +50,8 @@ export const onSubmitProxy = async (
     router.push(
       role === "lecturer" ? "/lecturer/dashboard" : "/student/dashboard"
     );
-  } catch (error: any) {
+  } catch (error) {
     console.error("[LOGIN ERROR]", error);
-    toast(`Failed to login: ${error?.message || error}`);
+    toast(`Failed to login: ${error}`);
   }
 };
