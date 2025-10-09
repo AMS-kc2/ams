@@ -41,16 +41,15 @@ export async function middleware(request: NextRequest) {
 
   // 🚪 2️⃣ If on login route and already authenticated → redirect to role dashboard
   if (currentPath.startsWith("/auth") && token) {
-    console.log("Really!!!");
     try {
       // Lightweight API call to validate and decode user info
-      const { data } = await axiosInstance.get<UserSession>("/auth/user-info", {
+      const data: UserSession = await axiosInstance.get("/auth/user-info", {
         withCredentials: true,
         headers: {
           Cookie: `${COOKIE_NAME}=${token}`,
         },
       });
-
+      console.log(data);
       if (data?.user?.role) {
         const role = data.user.role;
         return NextResponse.redirect(

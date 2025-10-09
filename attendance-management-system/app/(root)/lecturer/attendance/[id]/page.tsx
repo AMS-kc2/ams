@@ -274,7 +274,7 @@ const AttendancePage = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-3xl font-bold mb-1">
-                    {stats.total_students}
+                    {students.length ?? stats.total_students}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     Enrolled in course
@@ -328,7 +328,7 @@ const AttendancePage = () => {
                     <>
                       <p className="text-3xl font-bold mb-1">
                         {stats.last_session.students_present}/
-                        {stats.last_session.total_students}
+                        {students.length ?? stats.last_session.total_students}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         Students present

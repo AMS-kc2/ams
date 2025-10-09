@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
-import { Student, Lecturer } from "../server/types/auth";
+import { Student, Lecturer, UserSession } from "../server/types/auth";
 import { Course } from "@/components/auth/register-admin/schema";
 
 // Get current user session
@@ -94,5 +94,17 @@ export function useCurrentLecturer() {
         withCredentials: true,
       }),
     staleTime: 1000 * 60 * 10,
+  });
+}
+
+export default function useUser() {
+  return useQuery<UserSession>({
+    queryKey: ["user", "session"],
+    queryFn: async () =>
+      axiosInstance.get("/auth/user-info", {
+        withCredentials: true,
+      }),
+    staleTime: 1000 * 60 * 5,
+    retry: false,
   });
 }
