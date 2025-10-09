@@ -41,9 +41,13 @@ export const onSubmitProxy = async (
           };
 
     // 🔹 Call your Next.js proxy route, NOT backend directly
-    const res = await axios.post(`/api/auth/${role}/log-in`, formData, {
-      withCredentials: true, // allow cookies from proxy
-    });
+    const res = await axios.post(
+      `/api/auth/${role === "lecturer" ? "lecturer" : "student"}/log-in`,
+      formData,
+      {
+        withCredentials: true, // allow cookies from proxy
+      }
+    );
 
     toast("Successfully logged in");
 
