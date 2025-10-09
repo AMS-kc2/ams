@@ -23,12 +23,12 @@ export async function POST(
     // You may need to read raw response from axiosInstance to forward them correctly
     // If axiosInstance uses withCredentials, backend cookies will stick
     return response;
-  } catch (error: any) {
+  } catch (error) {
     console.error("[PROXY ERROR]", error);
     return NextResponse.json(
       {
         status: "error",
-        message: error.message || "Login failed",
+        message: error || "Login failed",
       },
       { status: 500 }
     );

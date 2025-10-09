@@ -57,32 +57,6 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LecturerFormData | StudentFormData) => {
-    // try {
-    //   const formData =
-    //     role === "lecturer"
-    //       ? {
-    //           lecturerId: (data as LecturerFormData).lecturerId,
-    //           password: (data as LecturerFormData).password,
-    //         }
-    //       : {
-    //           matricNumber: (data as StudentFormData).matricNumber,
-    //           surname: (data as StudentFormData).surname,
-    //         };
-
-    //   // 🔹 Call your Next.js proxy route, NOT backend directly
-    //   const res = await axios.post(`/api/auth/${role}/log-in`, formData, {
-    //     withCredentials: true, // allow cookies from proxy
-    //   });
-    //   console.log(res);
-    //   toast("Successfully logged in");
-
-    //   router.push(
-    //     role === "lecturer" ? "/lecturer/dashboard" : "/student/dashboard"
-    //   );
-    // } catch (error) {
-    //   console.error("[LOGIN ERROR]", error);
-    //   toast(`Failed to login: ${error}`);
-    // }
     await onSubmitProxy(data, role, router);
   };
 
