@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 // import { cn } from "@/lib/utils";
 import { useFetch } from "@/hooks/use-api";
+import NotFoundPage from "@/app/not-found";
 
 type StudentAttendance = {
   student_id: number;
@@ -196,6 +197,8 @@ const AttendancePage = () => {
         (s.matric_no ?? "").toLowerCase().includes(q)
     );
   }, [students, search]);
+
+  if (!anyLoading && anyError && !statsData) return <NotFoundPage />;
 
   const formatDate = (iso?: string | null) => {
     if (!iso) return "—";

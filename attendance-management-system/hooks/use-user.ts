@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axios";
-import { UserSession, Student, Lecturer } from "../server/types/auth";
+import { Student, Lecturer } from "../server/types/auth";
 import { Course } from "@/components/auth/register-admin/schema";
 
 // Get current user session

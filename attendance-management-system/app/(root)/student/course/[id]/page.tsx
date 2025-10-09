@@ -383,6 +383,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import { useCurrentStudent } from "@/hooks/use-user";
+import NotFoundPage from "@/app/not-found";
+// import NotFoundGoBackButton from "@/components/NotFoundGoBackButton";
 
 // Types (Keep as is)
 type course = {
@@ -400,7 +402,7 @@ type Attendance = {
   session_id: number;
   status: string | null;
   student_id: number;
-  verified_at: string | null;
+  sign_out_time: string | null;
 };
 
 type payload = course & { attendances: Attendance[] };
@@ -431,6 +433,8 @@ const CoursePage = () => {
   } = useFetch<payload>(["course", id], `/courses/${id}`);
 
   if (isLoading || studentLoading) return <Loading />;
+  if (!course && (!isLoading || !studentLoading)) return <NotFoundPage />;
+
   if (error || studentError)
     return <p>Error: {(error || studentError)?.message}</p>;
   if (!course) return <p>No data found</p>;
@@ -694,14 +698,14 @@ const CoursePage = () => {
                 <div className="space-y-0.5">
                   <p className="text-sm font-medium text-gray-700 flex items-center gap-2">
                     <Calendar size={14} />
-                    {attendance.verified_at
-                      ? new Date(attendance.verified_at).toLocaleDateString()
+                    {attendance.sign_out_time
+                      ? new Date(attendance.sign_out_time).toLocaleDateString()
                       : "N/A"}
                   </p>
                   <p className="text-xs text-gray-500 pl-4 flex items-center gap-2">
                     <Clock size={12} />
-                    {attendance.verified_at
-                      ? new Date(attendance.verified_at).toLocaleTimeString()
+                    {attendance.sign_out_time
+                      ? new Date(attendance.sign_out_time).toLocaleTimeString()
                       : "N/A"}
                   </p>
                 </div>

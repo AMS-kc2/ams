@@ -118,7 +118,7 @@ export const CourseCard = ({
     }
   };
 
-  const handleEndSession = async () => {
+  const handleEndSession = useCallback(async () => {
     setIsLoading(true);
     const result = await endSession(course.course_id);
     setIsLoading(false);
@@ -130,7 +130,7 @@ export const CourseCard = ({
     } else {
       toast.error(result.error || "Failed to end session");
     }
-  };
+  }, [course, refetchFeed, endSession]);
 
   // Memoized utility functions
   const formatTime = useMemo(

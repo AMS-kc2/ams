@@ -16,6 +16,8 @@ import { XCircle, LogOut } from "lucide-react";
 import { DashboardHeader } from "@/components/lecturer/dashboard-header";
 import { CourseCard } from "@/components/lecturer/course-card";
 import { CourseCardSkeleton } from "@/components/lecturer/course-card-skeleton";
+import { toast } from "sonner";
+import axiosInstance from "@/lib/axios";
 
 const Dashboard = () => {
   const router = useRouter();
@@ -58,6 +60,18 @@ const Dashboard = () => {
     return <p className="text-center py-10">No lecturer data found.</p>;
   }
 
+  const onLogOut = async () => {
+    try {
+      await axiosInstance.post("/auth/logout", {});
+
+      toast("Logged out successfully.");
+      router.push("/auth/lecturer/log-in");
+    } catch (error) {
+      console.error("Error logging out:", error);
+      toast("Failed to log out.");
+    }
+  };
+
   return (
     <div className="relative w-full min-h-screen bg-gradient-to-br from-background to-muted/20">
       <div className="absolute -top-14 right-4">
@@ -66,7 +80,7 @@ const Dashboard = () => {
           size="sm"
           className="flex gap-2 items-center shadow-sm hover:shadow-md transition-all"
         >
-          <LogOut size={15} /> Log Out
+          <LogOut size={15} onClick={onLogOut} /> Log Out
         </Button>
       </div>
 

@@ -20,7 +20,8 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Book, ChevronLeft, GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { onSubmitProxy } from "./proxy";
+import axiosInstance from "@/lib/axios";
+import { toast } from "sonner";
 
 /* -------------------- SCHEMAS -------------------- */
 // Base structure for role switching
@@ -57,7 +58,30 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LecturerFormData | StudentFormData) => {
-    await onSubmitProxy(data, role, router);
+    try {
+      // Only send relevant data based on role
+      // console.log(data);
+      const formData =
+        role === "lecturer"
+          ? {
+              lecturerId: (data as LecturerFormData).lecturerId,
+              password: (data as LecturerFormData).password,
+            }
+          : {
+              matricNumber: (data as StudentFormData).matricNumber,
+              surname: (data as StudentFormData).surname,
+            };
+
+      axiosInstance.post(`/auth/${role}/log-in`, formData, {
+        withCredentials: true,
+      });
+      toast("Successfully Logged In");
+      router.push(
+        role === "lecturer" ? "/lecturer/dashboard" : "/student/dashboard"
+      );
+    } catch (error) {
+      toast("Failed to login [BAD]:" + error);
+    }
   };
 
   return (
