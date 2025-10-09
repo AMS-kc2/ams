@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import axiosInstance from "@/lib/axios";
+import axios from "axios";
 
 /* -------------------- SCHEMAS -------------------- */
 // Base structure for role switching
@@ -59,8 +60,6 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LecturerFormData | StudentFormData) => {
     try {
-      // Only send relevant data based on role
-      console.log(data);
       const formData =
         role === "lecturer"
           ? {
@@ -72,15 +71,19 @@ export default function LoginPage() {
               surname: (data as StudentFormData).surname,
             };
 
-      axiosInstance.post(`/auth/${role}/log-in`, formData, {
-        withCredentials: true,
+      // 🔹 Call your Next.js proxy route, NOT backend directly
+      const res = await axios.post(`/api/auth/${role}/log-in`, formData, {
+        withCredentials: true, // allow cookies from proxy
       });
-      toast("Successfully Logged In");
+      console.log(res);
+      toast("Successfully logged in");
+
       router.push(
         role === "lecturer" ? "/lecturer/dashboard" : "/student/dashboard"
       );
-    } catch (error) {
-      toast(`Failed to login: ${error}`);
+    } catch (error: any) {
+      console.error("[LOGIN ERROR]", error);
+      toast(`Failed to login: ${error?.message || error}`);
     }
   };
 
