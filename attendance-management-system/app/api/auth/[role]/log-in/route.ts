@@ -1,34 +1,47 @@
 import { NextResponse } from "next/server";
-import axiosInstance from "@/lib/axios"; // your configured instance
+import axiosInstance from "@/lib/axios"; // preconfigured Axios instance
 
 export async function POST(
   req: Request,
-  { params }: { params: { role: string } }
+  ctx: { params: Promise<{ role: string }> }
 ) {
-  const { role } = params;
-
   try {
+    const { role } = await ctx.params;
     const body = await req.json();
 
-    // Forward request to backend API using axiosInstance
-    const data = await axiosInstance.post(`/auth/${role}/log-in`, body, {
-      withCredentials: true,
+    // 🔹 Forward the login request to your backend
+    const res = await axiosInstance.post(`/auth/${role}/log-in`, body, {
+      // Don't need withCredentials — same-domain proxy handles it
+      validateStatus: () => true, // prevent axios from throwing on non-2xx
     });
 
-    // Extract cookies from backend response (if any)
-    // Then pass them forward if Render sets cookies (optional)
-    const response = NextResponse.json({ status: "success", data });
+    // 🔹 Build the response
+    const nextRes = NextResponse.json({
+      status: "success",
+      data: res,
+    });
 
-    // ✅ Copy cookies manually (if backend sends Set-Cookie header)
-    // You may need to read raw response from axiosInstance to forward them correctly
-    // If axiosInstance uses withCredentials, backend cookies will stick
-    return response;
+    // 🔹 Forward backend cookies (if any)
+    const setCookie = res?.headers?.["set-cookie"];
+    if (setCookie) {
+      // Multiple cookies may be set
+      const cookies = Array.isArray(setCookie) ? setCookie : [setCookie];
+      cookies.forEach((cookie) => {
+        nextRes.headers.append("Set-Cookie", cookie);
+      });
+    }
+
+    return nextRes;
   } catch (error) {
     console.error("[PROXY ERROR]", error);
+
     return NextResponse.json(
       {
         status: "error",
-        message: error || "Login failed",
+        message:
+          error instanceof Error
+            ? error.message
+            : `An unexpected error occurred: ${error}`,
       },
       { status: 500 }
     );
