@@ -14,6 +14,8 @@ import {
 } from "../schema/auth.schema";
 import { COOKIE_NAME } from "../types/auth";
 
+const isProd = process.env.NODE_ENV === "production";
+
 // ====================== STUDENTS ======================
 export const studentSignup = async (req: Request, res: Response) => {
 	try {
@@ -96,11 +98,11 @@ export const studentLogin = async (req: Request, res: Response) => {
 		//Set the JWT in a secure HTTP-only cookie
 		res.cookie(COOKIE_NAME, token, {
 			maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-			httpOnly: true,
-			// secure: process.env.NODE_ENV === "production",
-			// sameSite: "lax",
-			sameSite: "none",
-			secure: true,
+			  httpOnly: true,
+			  secure: isProd, // only HTTPS on production
+			  sameSite: isProd ? "strict" : "lax",
+			  path: "/", // always '/' so it's available everywhere
+			  domain: isProd ? ".vercel.app" : undefined, // no domain for local dev
 		});
 
 		return sendSuccess(res, student, "Student logged in", 200);
@@ -201,12 +203,12 @@ export const lecturerLogin = async (req: Request, res: Response) => {
 
 		//Set the JWT in a secure HTTP-only cookie
 		res.cookie(COOKIE_NAME, token, {
-			maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-			httpOnly: true,
-			// secure: process.env.NODE_ENV === "production",
-			// sameSite: "lax",
-			sameSite: "none",
-			secure: true,
+		  maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+		  httpOnly: true,
+		  secure: isProd, // only HTTPS on production
+		  sameSite: isProd ? "strict" : "lax",
+		  path: "/", // always '/' so it's available everywhere
+		  domain: isProd ? ".vercel.app" : undefined, // no domain for local dev
 		});
 
 		return sendSuccess(res, lecturer, "Lecturer logged in", 200);
