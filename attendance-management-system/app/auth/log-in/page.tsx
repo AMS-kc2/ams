@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,6 @@ import { Book, ChevronLeft, GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import axiosInstance from "@/lib/axios";
 import axios from "axios";
 
 /* -------------------- SCHEMAS -------------------- */
@@ -81,9 +80,9 @@ export default function LoginPage() {
       router.push(
         role === "lecturer" ? "/lecturer/dashboard" : "/student/dashboard"
       );
-    } catch (error: any) {
+    } catch (error) {
       console.error("[LOGIN ERROR]", error);
-      toast(`Failed to login: ${error?.message || error}`);
+      toast(`Failed to login: ${error}`);
     }
   };
 
