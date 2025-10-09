@@ -17,7 +17,7 @@ import type { AuthenticatedRequest } from "../types/auth";
 const AuthRouter = Router();
 
 // Students Auths
-AuthRouter.post("/students/log-in", studentLogin);
+AuthRouter.post("/student/log-in", studentLogin);
 AuthRouter.post("/students/sign-up", studentSignup);
 
 //Lecturer Auths
