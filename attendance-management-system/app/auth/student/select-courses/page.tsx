@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 // import { COURSES } from "@/constants";
 import { useFetch } from "@/hooks/use-api";
 import axiosInstance from "@/lib/axios";
+import { Student } from "@/server/types/auth";
 import { Search } from "lucide-react";
 
 import { useRouter } from "next/navigation";
@@ -38,8 +39,13 @@ const SelectCoursesPage = () => {
 
   const onsubmit = async () => {
     try {
+      const studentData = localStorage.getItem("student");
+      if (!studentData) throw new Error("Student not found");
+
+      const student: Student = JSON.parse(studentData);
+
       await axiosInstance.post(
-        "/students/register-courses",
+        `/courses/register-courses/${student.id}`,
         {
           course_ids: selectedCourses,
         },

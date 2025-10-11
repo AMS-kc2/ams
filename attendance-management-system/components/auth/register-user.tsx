@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"; // <- using your UI wrapper (recommended)
 import axiosInstance from "@/lib/axios";
+import { Student } from "@/server/types/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronLeft, User } from "lucide-react";
 import Link from "next/link";
@@ -63,7 +64,12 @@ export default function RegisterUser() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await axiosInstance.post("/auth/students/sign-up", values);
+      const student: Student = await axiosInstance.post(
+        "/auth/students/sign-up",
+        values
+      );
+      //set student Info to local storrage for more configuration
+      localStorage.setItem("student", JSON.stringify(student));
 
       router.push("/auth/student/select-courses");
     } catch (error) {

@@ -8,7 +8,7 @@ const router = Router();
 // GET /courses
 router.get("/", courseController.getAllCourses);
 
-//POST /v1/students/register-courses/:Id
+//POST /v1/courses/register-courses/:Id
 router.post("/register-courses/:studentId", registerCourses);
 
 // GET /courses/student/:studentId
