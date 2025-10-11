@@ -61,6 +61,8 @@ const StudentDashboard = () => {
   useEffect(() => {
     if (student && student.courses.length === 0) {
       router.push("/auth/student/select-courses");
+    } else if (!student) {
+      router.push("/auth/student/log-in");
     }
   }, [student, router]);
 
@@ -71,15 +73,6 @@ const StudentDashboard = () => {
           <XCircle className="h-4 w-4" />
           <AlertDescription>Error: {studentError.message}</AlertDescription>
         </Alert>
-      </div>
-    );
-  }
-
-  if (!student) {
-    return (
-      <div className="px-4 py-8 flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <BookOpen className="h-12 w-12 text-muted-foreground/20 mb-3" />
-        <p className="text-sm text-muted-foreground">No student data found.</p>
       </div>
     );
   }
