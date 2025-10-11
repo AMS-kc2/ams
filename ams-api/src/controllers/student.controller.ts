@@ -125,16 +125,16 @@ export const getCurrentStudent = async (
   }
 };
 
-export const registerCourses = async (req: AuthenticatedRequest, res: Response) => {
+export const registerCourses = async (req: Request, res: Response) => {
   try {
-    const id = req.user?.id;
-    if (!id) throw new AppError("Unauthorized", 401);
+    const studentId = req.params.studentId;
+    if (!studentId) throw new AppError("Unauthorized", 401);
 
     // ✅ Fetch the student safely
     const { data: students, error: studentError } = await db
       .from("students")
       .select("*")
-      .eq("id", Number(id));
+      .eq("id", Number(studentId));
 
     if (studentError) throw new AppError(studentError.message);
     if (!students || students.length === 0)
@@ -193,7 +193,6 @@ export const registerCourses = async (req: AuthenticatedRequest, res: Response) 
 // import { AppError } from "@/lib/utils/AppError";
 // import { StudentDashboardSchema } from "@/schemas/student-dashboard"; // import zod schemas
 // import { z } from "zod";
-
 
 export const getStudentDashboard = async (req: AuthenticatedRequest, res: Response) => {
   try {
