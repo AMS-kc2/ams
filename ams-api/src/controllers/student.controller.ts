@@ -79,7 +79,7 @@ export const getCurrentStudent = async (
       .from("student_courses")
       .select(
         `
-        students(
+        students!inner(
           id,
           surname,
           matric_number,
@@ -91,8 +91,22 @@ export const getCurrentStudent = async (
       )
       .eq("student_id", id);
 
-    if (error) throw new AppError(`Failed to retrieve student: ${error.message}`);
-    if (!data || data.length === 0) throw new AppError("No student record found", 404);
+    if (!data || data.length === 0){
+      const {data: student, error: studentErr} = await db
+      .from("students")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle()
+
+      if(!student) throw new AppError("student does not exist", 404)
+      if(studentErr) throw new AppError(`Failed to retrieve student: ${studentErr}`)
+      const response = {
+      ...student,
+      courses: [],
+    };
+      return sendSuccess(res, response,"No Course Available, Kindly Register for course")
+    }
+    if (error) throw new AppError(`Failed to retrieve student: ${error}`);
 
     // Normalize: extract student info once and map courses
     const student = data[0].students;

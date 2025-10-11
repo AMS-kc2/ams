@@ -4,7 +4,6 @@ import {
 	getStudentById,
 	getStudentWithCourse,
 	getCurrentStudent,
-	registerCourses,
 	getStudentDashboard
 } from "../controllers/student.controller";
 
@@ -29,8 +28,6 @@ router.get("/:id", getStudentById);
 // POST /v1/students/courses/:courseId
 router.post("/courses/:courseId", getStudentWithCourse);
 
-//POST /v1/students/register-courses
-router.post("/register-courses", registerCourses);
 
 
 

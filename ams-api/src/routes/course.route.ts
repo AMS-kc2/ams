@@ -1,11 +1,15 @@
 import { Router } from "express";
 import * as courseController from "../controllers/course.controller";
 import { authenticateJWT } from "../middleware";
+import { registerCourses } from '@controllers/student.controller';
 
 const router = Router();
 
 // GET /courses
 router.get("/", courseController.getAllCourses);
+
+//POST /v1/students/register-courses
+router.post("/register-courses", registerCourses);
 
 // GET /courses/student/:studentId
 router.get(

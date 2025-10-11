@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 type CourseWithStats = {
   id: number;
@@ -39,6 +41,8 @@ type StudentDashboardData = {
 };
 
 const StudentDashboard = () => {
+  const router = useRouter();
+
   const {
     data: student,
     isLoading: studentLoading,
@@ -54,7 +58,11 @@ const StudentDashboard = () => {
 
   const isLoading = studentLoading || dashboardLoading;
 
-  if (isLoading) return <Loading />;
+  useEffect(() => {
+    if (student && student.courses.length === 0) {
+      router.push("/auth/student/select-courses");
+    }
+  }, [student, router]);
 
   if (studentError) {
     return (
@@ -75,6 +83,8 @@ const StudentDashboard = () => {
       </div>
     );
   }
+
+  if (isLoading) return <Loading />;
 
   const stats = dashboardData?.stats;
   const courses = dashboardData?.courses || [];
