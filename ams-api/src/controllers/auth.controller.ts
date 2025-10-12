@@ -105,7 +105,7 @@ export const studentLogin = async (req: Request, res: Response) => {
 			  domain: isProd ? ".vercel.app" : undefined, // no domain for local dev
 		});
 
-		return sendSuccess(res, student, "Student logged in", 200);
+		return sendSuccess(res, {...student, success: true}, "Student logged in", 200);
 	} catch (err) {
 		return sendError(err, res);
 	}
@@ -211,7 +211,7 @@ export const lecturerLogin = async (req: Request, res: Response) => {
 		  domain: isProd ? ".vercel.app" : undefined, // no domain for local dev
 		});
 
-		return sendSuccess(res, lecturer, "Lecturer logged in", 200);
+		return sendSuccess(res, {...lecturer, success: true}, "Lecturer logged in", 200);
 	} catch (error) {
 		return sendError(error, res);
 	}

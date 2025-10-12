@@ -54,7 +54,7 @@ const SelectCoursesPage = () => {
         }
       );
       toast("Successfully registered");
-      router.push("/student/dashboard");
+      router.push("/auth/student/log-in");
     } catch (error) {
       toast.error("Error occured while registering" + (error as Error).message);
     }
