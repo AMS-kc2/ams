@@ -45,6 +45,7 @@ export default function StudentLoginPage() {
     try {
       await axiosInstance.post("/auth/student/log-in", data);
       toast("Login successful");
+      localStorage.removeItem("student");
       router.push("/student/dashboard");
     } catch (error) {
       toast(error as string);

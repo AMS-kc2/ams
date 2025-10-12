@@ -84,6 +84,11 @@ export default function LoginPage() {
         throw new Error("Unable to log In");
       }
       toast("Successfully Logged In");
+
+      if (role === "student") {
+        localStorage.removeItem("student");
+      }
+
       router.push(
         role === "lecturer" ? "/lecturer/dashboard" : "/student/dashboard"
       );
